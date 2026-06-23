@@ -21,6 +21,9 @@ const AIS = [
   { id: 'grok',    name: 'Grok',    mark: 'Gr', color: '#1b1b1f' },
 ]
 const byId = (id) => AIS.find((a) => a.id === id) || {}
+// base servie (/ en prod, /portabia/ en preview) — pour les assets de public/
+const base = import.meta.env.BASE_URL
+const asset = (p) => base + p
 // mapping vers le moteur (chatgpt -> openai)
 const engineId = (id) => (id === 'chatgpt' ? 'openai' : id)
 
@@ -328,7 +331,7 @@ function downloadKit() {
           </div>
           <!-- PONTS MOTIF -->
           <div :data-anim="animFlag" style="position:relative;display:flex;justify-content:center;animation:pa-rise .8s .2s var(--ease-out) both;">
-            <svg viewBox="0 0 460 420" width="100%" style="max-width:480px;overflow:visible;">
+            <svg viewBox="0 0 460 440" width="100%" style="max-width:540px;overflow:visible;">
               <defs><linearGradient id="paGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--coral-400)"/><stop offset="1" stop-color="var(--coral-600)"/></linearGradient></defs>
               <g stroke="var(--border-strong)" stroke-width="2" fill="none" opacity="0.55">
                 <path d="M230 205 Q250 110 230 45"/><path d="M230 205 Q330 150 387 159"/><path d="M230 205 Q300 290 327 343"/><path d="M230 205 Q160 290 133 343"/><path d="M230 205 Q120 150 73 159"/>
@@ -337,9 +340,10 @@ function downloadKit() {
                 <path d="M230 205 Q250 110 230 45"/><path d="M230 205 Q330 150 387 159"/><path d="M230 205 Q300 290 327 343"/><path d="M230 205 Q160 290 133 343"/><path d="M230 205 Q120 150 73 159"/>
               </g>
               <g v-for="n in nodes" :key="n.id" class="pa-node" :style="n.anim">
-                <circle :cx="n.x" :cy="n.y" r="31" fill="var(--surface-elevated)" stroke="var(--border-default)" stroke-width="1.5"/>
-                <circle :cx="n.cdx" :cy="n.cdy" r="9" :fill="n.color"/>
-                <text :x="n.tx" :y="n.ty" text-anchor="middle" font-family="Geist,sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">{{ n.mark }}</text>
+                <circle :cx="n.x" :cy="n.y" r="38" fill="var(--surface-elevated)" stroke="var(--border-default)" stroke-width="1.5"/>
+                <circle :cx="n.x" :cy="n.y - 8" r="13" :fill="n.color"/>
+                <text :x="n.x" :y="n.y + 12" text-anchor="middle" font-family="Geist,sans-serif" font-size="12" font-weight="700" :fill="n.color">{{ n.mark }}</text>
+                <text :x="n.x" :y="n.y + 38 + 18" text-anchor="middle" font-family="Geist,sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)">{{ n.name }}</text>
               </g>
               <g class="pa-hub" style="transform-origin:230px 205px;animation:pa-pulse 3.4s var(--ease-in-out) infinite;">
                 <rect x="194" y="169" width="72" height="72" rx="20" fill="var(--navy-900)"/>
@@ -362,6 +366,21 @@ function downloadKit() {
           </div>
         </div>
         <p style="font-size:12.5px;color:var(--text-muted);text-align:center;max-width:60ch;margin:20px auto 0;line-height:1.5;">PortabIA n'est affilié à aucun de ces services. Les noms et marques cités appartiennent à leurs détenteurs respectifs.</p>
+      </section>
+
+      <!-- DÉMO VIDÉO -->
+      <section id="demo" style="max-width:1000px;margin:0 auto;padding:56px 32px 8px;">
+        <div style="text-align:center;margin-bottom:26px;">
+          <p style="font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--text-muted);text-transform:uppercase;margin:0 0 10px;">Démo · 1 min</p>
+          <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,4vw,46px);letter-spacing:-.02em;margin:0;color:var(--text-primary);">PortabIA en action.</h2>
+          <p style="font-size:16.5px;color:var(--text-secondary);max-width:48ch;margin:14px auto 0;line-height:1.6;">À quoi ça sert, pourquoi c'est libre et gratuit, et comment porter votre contexte d'une IA à l'autre — en une minute.</p>
+        </div>
+        <div style="position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--border-subtle);box-shadow:var(--shadow-lg);background:#0d1b2a;aspect-ratio:16/9;">
+          <video controls preload="none" playsinline :poster="asset('demo-poster.jpg')" style="width:100%;height:100%;display:block;object-fit:cover;">
+            <source :src="asset('demo.mp4')" type="video/mp4" />
+            Votre navigateur ne peut pas lire cette vidéo. <a :href="asset('demo.mp4')">Télécharger la démo</a>.
+          </video>
+        </div>
       </section>
 
       <!-- COMMENT CA MARCHE -->
