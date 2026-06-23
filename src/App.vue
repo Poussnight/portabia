@@ -4,7 +4,7 @@
  * Le wizard câble le moteur réel (engine.js) — génération 100% navigateur, sans API. */
 import { ref, reactive, computed } from 'vue'
 import { makeExportPrompt, makeImport, actionMetadata } from './engine.js'
-import { downloadBridge } from './download/bundle.js'
+import { downloadBridge, downloadBlob } from './download/bundle.js'
 import { LEGAL } from './content/legal.js'
 import { parseChatgptExport } from './transform/chatgptExport.js'
 import { parseRulesFile, aiFromFilename } from './transform/mdRules.js'
@@ -199,25 +199,56 @@ function next() {
   }
 }
 function prev() { step.value = Math.max(0, step.value - 1) }
-function reset() { step.value = 0; target.value = null }
+function reset() { step.value = 0; target.value = null; pastedResponse.value = ''; uploadedBundle.value = null; uploadInfo.value = null }
 
-/* Génère le « pont » : prompt d'export + import + fichier natif (Mode A, sans API). */
+/* ── Round-trip Mode A : coller la réponse de l'IA source -> vrai bundle ── */
+const pastedResponse = ref('')
+const copied = ref('')
+function copy(text, key) {
+  navigator.clipboard?.writeText(text).then(() => { copied.value = key; setTimeout(() => { copied.value = '' }, 1800) }).catch(() => {})
+}
+function parsePastedBundle(text) {
+  if (!text || !text.trim()) return null
+  let t = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim()
+  try {
+    const obj = JSON.parse(t)
+    if (obj && obj.axes) return { spec_version: '1.0', meta: { source_ai: engineId(source.value), scope: 'total' }, axes: obj.axes }
+  } catch { /* pas du JSON : on traite comme résumé */ }
+  return { spec_version: '1.0', meta: { source_ai: engineId(source.value), scope: 'total' }, axes: { conversation: { mode: 'summary', summary: text.trim().slice(0, 200000) } } }
+}
+// Le contenu réel : fichier déposé (Mode B) OU réponse collée de l'IA (Mode A).
+const effectiveBundle = computed(() => uploadedBundle.value || parsePastedBundle(pastedResponse.value))
+const exportPromptText = computed(() => makeExportPrompt(engineId(source.value), buildSelection()))
+const resultFiles = computed(() => {
+  const eb = effectiveBundle.value
+  if (!eb) return null
+  return makeImport({ bundle: eb, targetAi: engineId(target.value), timestamp: new Date().toISOString(),
+                      anonymize: { secrets: true, emails: true, paths: true } })
+})
+const hasRealContent = computed(() => !!effectiveBundle.value)
+
+function recordHistory() {
+  if (!currentUser.value) return
+  const meta = actionMetadata({ sourceAi: engineId(source.value), targetAi: engineId(target.value), selection: buildSelection(), timestamp: new Date().toISOString() })
+  api.historyAdd({ source_ai: meta.source_ai, target_ai: meta.target_ai, axes: meta.axes, scope: meta.scope, label: meta.label }).catch(() => {})
+}
+/* Télécharge le VRAI fichier natif cible (ex. CLAUDE.md / AGENTS.md). */
+function downloadNative() {
+  const rf = resultFiles.value
+  if (!rf) return
+  downloadBlob(rf.nativeFile.filename, new Blob([rf.nativeFile.content], { type: 'text/markdown' }))
+  recordHistory()
+}
+/* Télécharge le kit complet .json (prompts + fichier + métadonnées). */
 function downloadKit() {
+  const sAi = engineId(source.value), tAi = engineId(target.value)
   const selection = buildSelection()
-  const sAi = engineId(source.value)
-  const tAi = engineId(target.value)
   const ts = new Date().toISOString()
-  const exportPrompt = makeExportPrompt(sAi, selection)
-  // Mode B : si un fichier d'export a été déposé, on porte le contenu RÉEL.
-  // Sinon Mode A : bundle squelette que l'IA source remplira via le prompt d'export.
-  const baseBundle = uploadedBundle.value || { spec_version: '1.0', meta: { source_ai: sAi, scope: 'total' }, axes: Object.fromEntries(Object.keys(selection.axes).map((k) => [k, {}])) }
-  const { nativeFile, importPrompt } = makeImport({ bundle: baseBundle, targetAi: tAi, timestamp: ts, anonymize: { secrets: true, emails: true, paths: true } })
+  const base = effectiveBundle.value || { spec_version: '1.0', meta: { source_ai: sAi, scope: 'total' }, axes: Object.fromEntries(Object.keys(selection.axes).map((k) => [k, {}])) }
+  const { nativeFile, importPrompt } = makeImport({ bundle: base, targetAi: tAi, timestamp: ts, anonymize: { secrets: true, emails: true, paths: true } })
   const meta = actionMetadata({ sourceAi: sAi, targetAi: tAi, selection, timestamp: ts })
-  downloadBridge({ meta, exportPrompt, importPrompt, nativeFile, selection })
-  // Si connecté : enregistrer les MÉTADONNÉES (jamais le contenu) dans l'historique.
-  if (currentUser.value) {
-    api.historyAdd({ source_ai: sAi, target_ai: tAi, axes: meta.axes, scope: meta.scope, label: meta.label }).catch(() => {})
-  }
+  downloadBridge({ meta, exportPrompt: exportPromptText.value, importPrompt, nativeFile, selection })
+  recordHistory()
 }
 </script>
 
@@ -555,22 +586,46 @@ function downloadKit() {
           <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">Votre pont est prêt.</h2>
           <p style="font-size:16px;color:var(--text-secondary);margin:0 auto 28px;max-width:44ch;">Le fichier de migration est généré localement, dans votre navigateur. Importez-le dans votre nouvelle IA.</p>
         </div>
-        <div style="border:1px solid var(--border-subtle);border-radius:20px;background:var(--surface-elevated);box-shadow:var(--shadow-sm);overflow:hidden;">
-          <div style="display:flex;align-items:center;justify-content:center;gap:18px;padding:26px;background:var(--surface-sunken);border-bottom:1px solid var(--border-subtle);">
-            <span style="display:flex;flex-direction:column;align-items:center;gap:8px;"><span :style="'width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;background:'+src.color">{{ src.mark }}</span><span style="font-size:13px;font-weight:500;">{{ src.name }}</span></span>
-            <svg width="44" height="16" viewBox="0 0 44 16" fill="none"><path d="M1 8h38M33 2l7 6-7 6" stroke="var(--coral-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span style="display:flex;flex-direction:column;align-items:center;gap:8px;"><span :style="'width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;background:'+(tgt.color||'#999')">{{ tgt.mark }}</span><span style="font-size:13px;font-weight:500;">{{ tgt.name || '—' }}</span></span>
-          </div>
-          <div style="padding:22px 24px;">
-            <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">Inclus dans le pont</div>
-            <div style="display:flex;flex-direction:column;gap:9px;">
-              <div v-for="x in selectedList" :key="x.id" style="display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text-primary);"><span style="color:var(--success);">✓</span>{{ x.title }}</div>
-            </div>
+        <!-- en-tête source -> cible -->
+        <div style="display:flex;align-items:center;justify-content:center;gap:18px;padding:20px;margin-bottom:8px;">
+          <span style="display:flex;flex-direction:column;align-items:center;gap:8px;"><span :style="'width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;background:'+src.color">{{ src.mark }}</span><span style="font-size:13px;font-weight:500;">{{ src.name }}</span></span>
+          <svg width="44" height="16" viewBox="0 0 44 16" fill="none"><path d="M1 8h38M33 2l7 6-7 6" stroke="var(--coral-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="display:flex;flex-direction:column;align-items:center;gap:8px;"><span :style="'width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;background:'+(tgt.color||'#999')">{{ tgt.mark }}</span><span style="font-size:13px;font-weight:500;">{{ tgt.name || '—' }}</span></span>
+        </div>
+
+        <!-- ÉTAPE 1 : prompt d'export (si pas de fichier déposé) -->
+        <div v-if="!uploadedBundle" style="border:1px solid var(--border-subtle);border-radius:18px;background:var(--surface-elevated);padding:22px;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="width:24px;height:24px;border-radius:999px;background:var(--coral-500);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;">1</span><h3 style="font-family:var(--font-sans);font-weight:600;font-size:16px;margin:0;">Copiez ce prompt dans {{ src.name }}</h3></div>
+          <p style="font-size:13.5px;color:var(--text-secondary);margin:0 0 12px;">{{ src.name }} vous renverra un bloc structuré : copiez sa réponse et collez-la à l'étape 2.</p>
+          <div style="position:relative;">
+            <pre style="font-family:var(--font-mono);font-size:12px;line-height:1.5;color:var(--text-primary);background:var(--surface-sunken);border:1px solid var(--border-subtle);border-radius:12px;padding:14px;max-height:160px;overflow:auto;white-space:pre-wrap;margin:0;">{{ exportPromptText }}</pre>
+            <button @click="copy(exportPromptText,'exp')" style="position:absolute;top:10px;right:10px;font-size:12px;font-weight:600;background:var(--coral-500);color:#fff;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;">{{ copied==='exp' ? 'Copié ✓' : 'Copier' }}</button>
           </div>
         </div>
-        <div style="display:flex;gap:12px;margin-top:22px;flex-wrap:wrap;">
-          <button @click="downloadKit" style="flex:1;min-width:200px;font-family:var(--font-sans);font-weight:600;font-size:16px;color:#fff;background:var(--coral-500);border:none;border-radius:14px;padding:16px;cursor:pointer;min-height:52px;box-shadow:var(--shadow-glow-coral);">⬇ Télécharger le pont (.json)</button>
-          <button @click="reset" style="font-family:var(--font-sans);font-weight:600;font-size:16px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:14px;padding:16px 22px;cursor:pointer;min-height:52px;">Recommencer</button>
+
+        <!-- ÉTAPE 2 : coller la réponse (round-trip) -->
+        <div v-if="!uploadedBundle" style="border:1px solid var(--border-subtle);border-radius:18px;background:var(--surface-elevated);padding:22px;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="width:24px;height:24px;border-radius:999px;background:var(--coral-500);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;">2</span><h3 style="font-family:var(--font-sans);font-weight:600;font-size:16px;margin:0;">Collez la réponse de {{ src.name }}</h3></div>
+          <textarea v-model="pastedResponse" rows="5" placeholder="Collez ici ce que votre IA vous a répondu (JSON ou texte)…" style="width:100%;font-family:var(--font-mono);font-size:13px;padding:12px;border:1px solid var(--border-default);border-radius:12px;background:var(--surface-canvas);color:var(--text-primary);resize:vertical;"></textarea>
+          <p style="font-size:12.5px;color:var(--text-muted);margin:8px 0 0;">Tout est traité localement, dans votre navigateur.</p>
+        </div>
+
+        <!-- ÉTAPE 3 : résultat réel -->
+        <div :style="'border:1px solid '+(hasRealContent?'color-mix(in oklab,var(--success) 36%,transparent)':'var(--border-subtle)')+';border-radius:18px;background:var(--surface-elevated);padding:22px;'">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span :style="'width:24px;height:24px;border-radius:999px;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;background:'+(hasRealContent?'var(--success)':'var(--border-strong)')">3</span><h3 style="font-family:var(--font-sans);font-weight:600;font-size:16px;margin:0;">Récupérez votre fichier pour {{ tgt.name }}</h3></div>
+          <p v-if="!hasRealContent" style="font-size:13.5px;color:var(--text-muted);margin:0;">En attente du contenu (étape 2, ou déposez un fichier d'export à l'étape précédente).</p>
+          <template v-else>
+            <p style="font-size:13.5px;color:var(--text-secondary);margin:0 0 14px;">Votre contexte est converti au format <b>{{ tgt.name }}</b> : téléchargez le fichier <code style="font-family:var(--font-mono);font-size:12.5px;">{{ resultFiles.nativeFile.filename }}</code>, puis collez le prompt d'import dans {{ tgt.name }}.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+              <button @click="downloadNative" style="font-family:var(--font-sans);font-weight:600;font-size:15px;color:#fff;background:var(--coral-500);border:none;border-radius:12px;padding:12px 18px;cursor:pointer;box-shadow:var(--shadow-glow-coral);">⬇ Télécharger {{ resultFiles.nativeFile.filename }}</button>
+              <button @click="copy(resultFiles.importPrompt,'imp')" style="font-family:var(--font-sans);font-weight:600;font-size:15px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:12px;padding:12px 18px;cursor:pointer;">{{ copied==='imp' ? 'Prompt copié ✓' : 'Copier le prompt d\'import' }}</button>
+            </div>
+          </template>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;">
+          <button @click="downloadKit" style="flex:1;min-width:200px;font-family:var(--font-sans);font-weight:600;font-size:15px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:14px;padding:14px;cursor:pointer;">⬇ Tout le kit (.json)</button>
+          <button @click="reset" style="font-family:var(--font-sans);font-weight:600;font-size:15px;color:var(--text-secondary);background:none;border:1px solid var(--border-default);border-radius:14px;padding:14px 20px;cursor:pointer;">Recommencer</button>
         </div>
       </template>
 

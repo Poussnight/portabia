@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://portabia.essn.fr/sitemap.xml
