@@ -28,12 +28,13 @@ const asset = (p) => base + p
 const engineId = (id) => (id === 'chatgpt' ? 'openai' : id)
 
 // items du wizard -> axes moteur
+// pro:true = axe avancé réservé aux inscrits (anonyme = migration basique)
 const ITEMS = [
   { id: 'conv',    title: 'Historique de conversations', body: 'Vos fils de discussion, ordonnés et horodatés.', axis: 'conversation' },
   { id: 'instr',   title: 'Instructions & préférences',  body: 'Vos consignes personnalisées et votre ton.',       axis: 'code_config' },
-  { id: 'proj',    title: 'Projets & fichiers',          body: 'Dossiers de travail et documents attachés.',       axis: 'project' },
-  { id: 'mem',     title: 'Mémoire / contexte long terme', body: 'Ce que l’IA a retenu de vous au fil du temps.',  axis: 'project' },
-  { id: 'persona', title: 'Personas & styles',           body: 'Vos assistants et configurations sur mesure.',     axis: 'code_config' },
+  { id: 'proj',    title: 'Projets & fichiers',          body: 'Dossiers de travail et documents attachés.',       axis: 'project', pro: true },
+  { id: 'mem',     title: 'Mémoire / contexte long terme', body: 'Ce que l’IA a retenu de vous au fil du temps.',  axis: 'project', pro: true },
+  { id: 'persona', title: 'Personas & styles',           body: 'Vos assistants et configurations sur mesure.',     axis: 'code_config', pro: true },
 ]
 
 const view = ref('landing')
@@ -41,7 +42,7 @@ const theme = ref('light')
 const step = ref(0)
 const source = ref('chatgpt')
 const target = ref(null)
-const items = reactive({ conv: true, instr: true, mem: true, proj: false, persona: false })
+const items = reactive({ conv: true, instr: true, mem: false, proj: false, persona: false })
 // granularité fine par item : 'total' (tout) ou 'partial' (l'essentiel)
 const gran = reactive({ conv: 'partial', instr: 'total', mem: 'total', proj: 'total', persona: 'total' })
 const granOptions = [{ id: 'total', label: 'Tout' }, { id: 'partial', label: "L'essentiel" }]
@@ -62,6 +63,9 @@ function openLegal(id) { legalId.value = id; view.value = 'legal'; window.scroll
 // ---- Auth / compte ----
 const currentUser = ref(null)
 const showAuth = ref(false)
+const isAuthed = computed(() => !!currentUser.value)
+const resetToken = ref('')
+function requireAuth() { showAuth.value = true }
 function onAuthed(user) { currentUser.value = user; showAuth.value = false; view.value = 'account'; window.scrollTo(0, 0) }
 function logout() { setToken(null); currentUser.value = null; view.value = 'landing' }
 function goAccount() { if (currentUser.value) { view.value = 'account'; window.scrollTo(0, 0) } else { showAuth.value = true } }
@@ -69,6 +73,8 @@ onMounted(async () => {
   // vérification e-mail via #verify=...
   const m = window.location.hash.match(/verify=([a-f0-9]+)/)
   if (m) { try { await api.verifyEmail(m[1]) } catch { /* */ } }
+  const r = window.location.hash.match(/reset=([\w.\-]+)/)
+  if (r) { resetToken.value = r[1]; showAuth.value = true }
   if (getToken()) { try { currentUser.value = (await api.me()).user } catch { setToken(null) } }
   loadReviews()
 })
@@ -151,9 +157,11 @@ const targetList = computed(() => AIS.filter((a) => a.id !== source.value).map((
 function pickSource(id) { source.value = id; if (target.value === id) target.value = null }
 function pickTarget(id) { target.value = id }
 const itemList = computed(() => ITEMS.map((it) => {
-  const on = !!items[it.id]
-  return { ...it, on, granVal: gran[it.id] || 'total', check: on ? '✓' : '',
-    rowStyle: on ? 'border-color:var(--coral-500);background:color-mix(in oklab,var(--coral-500) 7%,var(--surface-elevated));' : 'border-color:var(--border-default);background:var(--surface-elevated);',
+  const locked = !!it.pro && !isAuthed.value
+  const on = !!items[it.id] && !locked
+  return { ...it, on, locked, granVal: gran[it.id] || 'total', check: on ? '✓' : '',
+    rowStyle: locked ? 'border-color:var(--border-default);background:var(--surface-sunken);opacity:.72;'
+      : on ? 'border-color:var(--coral-500);background:color-mix(in oklab,var(--coral-500) 7%,var(--surface-elevated));' : 'border-color:var(--border-default);background:var(--surface-elevated);',
     boxStyle: on ? 'background:var(--coral-500);' : 'background:transparent;border:2px solid var(--border-strong);' }
 }))
 function segStyle(it, gid) {
@@ -162,7 +170,11 @@ function segStyle(it, gid) {
     (active ? 'background:var(--coral-500);color:#fff;border:1px solid var(--coral-500);'
             : 'background:transparent;color:var(--text-secondary);border:1px solid var(--border-default);')
 }
-function toggleItem(id) { items[id] = !items[id] }
+function toggleItem(id) {
+  const it = ITEMS.find((x) => x.id === id)
+  if (it && it.pro && !isAuthed.value) { requireAuth(); return }
+  items[id] = !items[id]
+}
 
 const stepNames = ['Source', 'Destination', 'À migrer', 'Pont prêt']
 const stepDots = computed(() => [0, 1, 2, 3].map((i) => ({ style: i <= step.value ? 'background:var(--coral-500);' : 'background:var(--border-default);' })))
@@ -202,7 +214,8 @@ function buildSelection() {
   const axes = {}
   for (const it of ITEMS) {
     if (!items[it.id]) continue
-    const g = gran[it.id] || 'total'
+    if (it.pro && !isAuthed.value) continue   // anonyme : axes avancés ignorés
+    const g = isAuthed.value ? (gran[it.id] || 'total') : 'total'   // granularité fine = inscrits
     // deux items peuvent viser le même axe (mem+proj, instr+persona) : 'total' (plus inclusif) l'emporte
     const cur = axes[it.axis]
     const scope = cur ? (cur.scope === 'total' || g === 'total' ? 'total' : 'partial') : g
@@ -649,30 +662,37 @@ function downloadKit() {
       <!-- step 2 -->
       <template v-else-if="step===2">
         <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">Que voulez-vous emporter ?</h2>
-        <p style="font-size:16px;color:var(--text-secondary);margin:0 0 28px;">Cochez ce qui doit traverser le pont. Rien n'est envoyé sans vous.</p>
+        <p style="font-size:16px;color:var(--text-secondary);margin:0 0 28px;">Cochez ce qui doit traverser le pont. Rien n'est envoyé sans vous.<span v-if="!isAuthed"> La migration de base est <strong style="color:var(--text-primary);">gratuite et sans compte</strong> ; les axes avancés et le réglage fin sont réservés aux inscrits.</span></p>
         <div style="display:flex;flex-direction:column;gap:12px;">
           <div v-for="it in itemList" :key="it.id" :style="'border-radius:14px;border:2px solid;'+it.rowStyle">
             <button @click="toggleItem(it.id)" style="width:100%;display:flex;align-items:center;gap:16px;padding:18px 20px;background:none;border:none;cursor:pointer;text-align:left;">
-              <span :style="'width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;'+it.boxStyle">{{ it.check }}</span>
-              <span><span style="display:block;font-size:16px;font-weight:600;color:var(--text-primary);">{{ it.title }}</span><span style="display:block;font-size:13.5px;color:var(--text-secondary);margin-top:2px;">{{ it.body }}</span></span>
+              <span v-if="it.locked" style="width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text-muted);background:var(--surface-elevated);border:1px solid var(--border-default);">🔒</span>
+              <span v-else :style="'width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;'+it.boxStyle">{{ it.check }}</span>
+              <span style="flex:1;"><span style="display:block;font-size:16px;font-weight:600;color:var(--text-primary);">{{ it.title }}</span><span style="display:block;font-size:13.5px;color:var(--text-secondary);margin-top:2px;">{{ it.body }}</span></span>
+              <span v-if="it.locked" style="flex:none;font-family:var(--font-sans);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--coral-700);background:var(--coral-50);border:1px solid color-mix(in srgb,var(--coral-500) 30%,transparent);border-radius:999px;padding:4px 10px;">Inscription</span>
             </button>
-            <div v-if="it.on" style="display:flex;align-items:center;gap:8px;padding:0 20px 16px 62px;">
+            <!-- granularité fine : réservée aux inscrits -->
+            <div v-if="it.on && isAuthed" style="display:flex;align-items:center;gap:8px;padding:0 20px 16px 62px;">
               <span style="font-size:12px;color:var(--text-muted);">Quantité :</span>
               <button v-for="g in granOptions" :key="g.id" @click="setGran(it.id, g.id)" :style="segStyle(it, g.id)">{{ g.label }}</button>
             </div>
+            <div v-else-if="it.on && !isAuthed" style="padding:0 20px 14px 62px;">
+              <button @click="requireAuth" style="font-family:var(--font-sans);font-size:12.5px;font-weight:600;color:var(--coral-700);background:none;border:none;cursor:pointer;padding:0;">🔒 Régler la quantité (Tout / l'essentiel) — réservé aux inscrits →</button>
+            </div>
           </div>
         </div>
-        <!-- Mode B : import direct d'un fichier d'export (optionnel) -->
+        <!-- Mode B : import direct d'un fichier d'export — réservé aux inscrits -->
         <div style="margin-top:18px;padding:18px 20px;border:1px dashed var(--border-strong);border-radius:14px;background:var(--surface-sunken);">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
             <div>
-              <div style="font-size:14.5px;font-weight:600;color:var(--text-primary);">Vous avez un fichier d'export ? <span style="font-weight:400;color:var(--text-muted);">(optionnel)</span></div>
+              <div style="font-size:14.5px;font-weight:600;color:var(--text-primary);">Vous avez un fichier d'export ? <span v-if="isAuthed" style="font-weight:400;color:var(--text-muted);">(optionnel)</span><span v-else style="font-family:var(--font-sans);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--coral-700);background:var(--coral-50);border:1px solid color-mix(in srgb,var(--coral-500) 30%,transparent);border-radius:999px;padding:3px 9px;margin-left:8px;">🔒 Inscription</span></div>
               <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">Déposez votre <code style="font-family:var(--font-mono);font-size:12px;">conversations.json</code> (ChatGPT) ou un fichier de règles (CLAUDE.md, AGENTS.md…) pour une migration directe, traitée dans votre navigateur.</div>
             </div>
-            <label style="font-family:var(--font-sans);font-weight:600;font-size:14px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:10px;padding:10px 16px;cursor:pointer;white-space:nowrap;">
+            <label v-if="isAuthed" style="font-family:var(--font-sans);font-weight:600;font-size:14px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:10px;padding:10px 16px;cursor:pointer;white-space:nowrap;">
               Choisir un fichier
               <input type="file" accept=".json,.md,.txt,.cursorrules" @change="onFile" style="display:none;" />
             </label>
+            <button v-else @click="requireAuth" style="font-family:var(--font-sans);font-weight:600;font-size:14px;color:#fff;background:var(--coral-500);border:none;border-radius:10px;padding:10px 16px;cursor:pointer;white-space:nowrap;">Débloquer →</button>
           </div>
           <div v-if="uploadInfo" style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13.5px;color:var(--success);font-weight:500;"><span>✓</span>{{ uploadInfo }} · traité localement</div>
           <div v-if="uploadError" style="margin-top:12px;font-size:13.5px;color:var(--danger,#c0392b);">⚠ {{ uploadError }}</div>
@@ -738,7 +758,7 @@ function downloadKit() {
       </div>
     </main>
 
-    <AuthModal v-if="showAuth" @close="showAuth=false" @authed="onAuthed" />
+    <AuthModal v-if="showAuth" :reset-token="resetToken" @close="showAuth=false;resetToken=''" @authed="onAuthed" />
 
   </div>
 </template>
