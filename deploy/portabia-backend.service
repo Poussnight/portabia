@@ -1,0 +1,19 @@
+[Unit]
+Description=PortabIA backend isolé (Gunicorn port 5006) — E²SN
+After=network.target postgresql.service
+
+[Service]
+User=dev
+WorkingDirectory=/home/dev/portabia/backend
+EnvironmentFile=/home/dev/portabia/backend/.env
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/dev/bin"
+ExecStart=/home/dev/bin/gunicorn --workers 2 --threads 2 --worker-class gthread \
+  --bind 127.0.0.1:5006 --timeout 60 \
+  --access-logfile /home/dev/portabia/backend/gunicorn_access.log \
+  --error-logfile /home/dev/portabia/backend/gunicorn_error.log \
+  --log-level info app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

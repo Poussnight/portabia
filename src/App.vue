@@ -8,6 +8,10 @@ import { downloadBridge } from './download/bundle.js'
 import { LEGAL } from './content/legal.js'
 import { parseChatgptExport } from './transform/chatgptExport.js'
 import { parseRulesFile, aiFromFilename } from './transform/mdRules.js'
+import { onMounted } from 'vue'
+import AuthModal from './components/AuthModal.vue'
+import AccountView from './components/AccountView.vue'
+import { api, getToken, setToken } from './api/client.js'
 
 const AIS = [
   { id: 'claude',  name: 'Claude',  mark: 'Cl', color: '#C8643F' },
@@ -47,6 +51,19 @@ function goWizard() { view.value = 'wizard'; step.value = 0 }
 function goHome() { view.value = 'landing'; window.scrollTo(0, 0) }
 function toggleTheme() { theme.value = theme.value === 'dark' ? 'light' : 'dark' }
 function openLegal(id) { legalId.value = id; view.value = 'legal'; window.scrollTo(0, 0) }
+
+// ---- Auth / compte ----
+const currentUser = ref(null)
+const showAuth = ref(false)
+function onAuthed(user) { currentUser.value = user; showAuth.value = false; view.value = 'account'; window.scrollTo(0, 0) }
+function logout() { setToken(null); currentUser.value = null; view.value = 'landing' }
+function goAccount() { if (currentUser.value) { view.value = 'account'; window.scrollTo(0, 0) } else { showAuth.value = true } }
+onMounted(async () => {
+  // vérification e-mail via #verify=...
+  const m = window.location.hash.match(/verify=([a-f0-9]+)/)
+  if (m) { try { await api.verifyEmail(m[1]) } catch { /* */ } }
+  if (getToken()) { try { currentUser.value = (await api.me()).user } catch { setToken(null) } }
+})
 
 /* ---------- LANDING data ---------- */
 const ais = computed(() => AIS.map((a) => ({ ...a, markStyle: `background:${a.color}` })))
@@ -164,6 +181,10 @@ function downloadKit() {
   const { nativeFile, importPrompt } = makeImport({ bundle: baseBundle, targetAi: tAi, timestamp: ts, anonymize: { secrets: true, emails: true, paths: true } })
   const meta = actionMetadata({ sourceAi: sAi, targetAi: tAi, selection, timestamp: ts })
   downloadBridge({ meta, exportPrompt, importPrompt, nativeFile, selection })
+  // Si connecté : enregistrer les MÉTADONNÉES (jamais le contenu) dans l'historique.
+  if (currentUser.value) {
+    api.historyAdd({ source_ai: sAi, target_ai: tAi, axes: meta.axes, scope: meta.scope, label: meta.label }).catch(() => {})
+  }
 }
 </script>
 
@@ -194,6 +215,7 @@ function downloadKit() {
         <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
           <span style="font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;color:var(--text-muted);">FR</span>
           <button @click="toggleTheme" aria-label="Basculer le thème" style="width:38px;height:38px;border-radius:999px;border:1px solid var(--border-default);background:var(--surface-elevated);color:var(--text-primary);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;">{{ themeIcon }}</button>
+          <button @click="goAccount" style="font-family:var(--font-sans);font-weight:600;font-size:14px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:999px;padding:10px 16px;cursor:pointer;min-height:44px;">{{ currentUser ? 'Mon compte' : 'Connexion' }}</button>
           <button @click="goWizard" style="font-family:var(--font-sans);font-weight:600;font-size:14.5px;color:#fff;background:var(--coral-500);border:none;border-radius:999px;padding:11px 20px;cursor:pointer;box-shadow:var(--shadow-sm);min-height:44px;">Migrer maintenant →</button>
         </div>
       </div>
@@ -384,6 +406,9 @@ function downloadKit() {
       <p style="font-size:12.5px;color:var(--text-muted);margin-top:36px;border-top:1px solid var(--border-subtle);padding-top:18px;">Service gratuit opéré par E²SN — Guillaume BOUTON · Open-source (Apache-2.0) · contact@essn.fr</p>
     </main>
 
+    <!-- ===== COMPTE ===== -->
+    <AccountView v-else-if="view==='account' && currentUser" :user="currentUser" @home="goHome" @logout="logout" />
+
     <!-- ===== WIZARD ===== -->
     <main v-else-if="view==='wizard'" style="max-width:760px;margin:0 auto;padding:48px 32px 90px;">
       <button @click="goHome" style="font-family:var(--font-sans);font-size:14px;color:var(--text-secondary);background:none;border:none;cursor:pointer;padding:0;margin-bottom:24px;">← Retour à l'accueil</button>
@@ -478,6 +503,8 @@ function downloadKit() {
         <button @click="next" :style="'font-family:var(--font-sans);font-weight:600;font-size:15px;color:#fff;border:none;border-radius:12px;padding:13px 26px;min-height:48px;'+nextStyle">{{ nextLabel }}</button>
       </div>
     </main>
+
+    <AuthModal v-if="showAuth" @close="showAuth=false" @authed="onAuthed" />
 
   </div>
 </template>
