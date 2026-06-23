@@ -5,6 +5,7 @@
 import { ref, reactive, computed } from 'vue'
 import { makeExportPrompt, makeImport, actionMetadata } from './engine.js'
 import { downloadBridge } from './download/bundle.js'
+import { LEGAL } from './content/legal.js'
 
 const AIS = [
   { id: 'claude',  name: 'Claude',  mark: 'Cl', color: '#C8643F' },
@@ -38,9 +39,12 @@ const animOn = ref(true)
 const themeIcon = computed(() => (theme.value === 'dark' ? '☀' : '☾'))
 const animFlag = computed(() => (animOn.value ? 'on' : 'off'))
 
+const legalId = ref('cgu')
+const legalDoc = computed(() => LEGAL[legalId.value] || LEGAL.cgu)
 function goWizard() { view.value = 'wizard'; step.value = 0 }
-function goHome() { view.value = 'landing' }
+function goHome() { view.value = 'landing'; window.scrollTo(0, 0) }
 function toggleTheme() { theme.value = theme.value === 'dark' ? 'light' : 'dark' }
+function openLegal(id) { legalId.value = id; view.value = 'legal'; window.scrollTo(0, 0) }
 
 /* ---------- LANDING data ---------- */
 const ais = computed(() => AIS.map((a) => ({ ...a, markStyle: `background:${a.color}` })))
@@ -325,11 +329,11 @@ function downloadKit() {
           </div>
           <div>
             <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;">Ressources</div>
-            <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;"><a href="#" style="color:var(--text-secondary);text-decoration:none;">GitHub · Apache-2.0 ↗</a><a href="#privacy" style="color:var(--text-secondary);text-decoration:none;">Transmission aux IA</a><a href="#" style="color:var(--text-secondary);text-decoration:none;">État du service</a></div>
+            <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;"><a href="#" style="color:var(--text-secondary);text-decoration:none;">GitHub · Apache-2.0 ↗</a><a href="#" @click.prevent="openLegal('transmission')" style="color:var(--text-secondary);text-decoration:none;cursor:pointer;">Transmission aux IA</a><a href="#" style="color:var(--text-secondary);text-decoration:none;">État du service</a></div>
           </div>
           <div>
             <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;">Légal</div>
-            <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;"><a href="#" style="color:var(--text-secondary);text-decoration:none;">CGU</a><a href="#" style="color:var(--text-secondary);text-decoration:none;">Mentions légales</a><a href="#" style="color:var(--text-secondary);text-decoration:none;">Confidentialité</a></div>
+            <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;"><a href="#" @click.prevent="openLegal('cgu')" style="color:var(--text-secondary);text-decoration:none;cursor:pointer;">CGU</a><a href="#" @click.prevent="openLegal('mentions')" style="color:var(--text-secondary);text-decoration:none;cursor:pointer;">Mentions légales</a><a href="#" @click.prevent="openLegal('confidentialite')" style="color:var(--text-secondary);text-decoration:none;cursor:pointer;">Confidentialité</a></div>
           </div>
         </div>
         <div style="max-width:var(--container);margin:0 auto;padding:20px 32px 40px;border-top:1px solid var(--border-subtle);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;">
@@ -339,8 +343,24 @@ function downloadKit() {
       </footer>
     </main>
 
+    <!-- ===== LÉGAL ===== -->
+    <main v-else-if="view==='legal'" style="max-width:780px;margin:0 auto;padding:48px 32px 90px;">
+      <button @click="goHome" style="font-family:var(--font-sans);font-size:14px;color:var(--text-secondary);background:none;border:none;cursor:pointer;padding:0;margin-bottom:24px;">← Retour à l'accueil</button>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;">
+        <button v-for="(d,k) in { cgu:'CGU', mentions:'Mentions légales', confidentialite:'Confidentialité', transmission:'Transmission aux IA' }" :key="k" @click="openLegal(k)" :style="'font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;cursor:pointer;border:1px solid var(--border-default);'+(legalId===k?'background:var(--coral-500);color:#fff;border-color:var(--coral-500);':'background:var(--surface-elevated);color:var(--text-secondary);')">{{ d }}</button>
+      </div>
+      <h1 style="font-family:var(--font-display);font-weight:400;font-size:clamp(32px,4vw,46px);letter-spacing:-.02em;margin:0 0 28px;">{{ legalDoc.title }}</h1>
+      <div style="display:flex;flex-direction:column;gap:22px;">
+        <div v-for="(b,i) in legalDoc.blocks" :key="i">
+          <h2 style="font-family:var(--font-sans);font-weight:600;font-size:17px;margin:0 0 6px;color:var(--text-primary);">{{ b[0] }}</h2>
+          <p style="font-size:15px;line-height:1.65;color:var(--text-secondary);margin:0;">{{ b[1] }}</p>
+        </div>
+      </div>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-top:36px;border-top:1px solid var(--border-subtle);padding-top:18px;">Service gratuit opéré par E²SN — Guillaume BOUTON · Open-source (Apache-2.0) · contact@essn.fr</p>
+    </main>
+
     <!-- ===== WIZARD ===== -->
-    <main v-else style="max-width:760px;margin:0 auto;padding:48px 32px 90px;">
+    <main v-else-if="view==='wizard'" style="max-width:760px;margin:0 auto;padding:48px 32px 90px;">
       <button @click="goHome" style="font-family:var(--font-sans);font-size:14px;color:var(--text-secondary);background:none;border:none;cursor:pointer;padding:0;margin-bottom:24px;">← Retour à l'accueil</button>
 
       <div style="display:flex;gap:8px;margin-bottom:8px;">
