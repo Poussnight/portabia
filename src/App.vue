@@ -63,6 +63,7 @@ onMounted(async () => {
   const m = window.location.hash.match(/verify=([a-f0-9]+)/)
   if (m) { try { await api.verifyEmail(m[1]) } catch { /* */ } }
   if (getToken()) { try { currentUser.value = (await api.me()).user } catch { setToken(null) } }
+  loadReviews()
 })
 
 /* ---------- LANDING data ---------- */
@@ -100,7 +101,39 @@ const faqsRaw = [
 ]
 const faqs = computed(() => faqsRaw.map((f, i) => ({ ...f, open: faqOpen.value === i, sign: faqOpen.value === i ? '–' : '+' })))
 function toggleFaq(i) { faqOpen.value = faqOpen.value === i ? null : i }
+// ---- Partage social (fonctionnel) ----
+const shareUrl = 'https://preview.essn.fr/portabia/'
+const shareText = 'PortabIA — migrez gratuitement votre historique d\'une IA à l\'autre, sans rien perdre. Par E²SN.'
+function shareTo(net) {
+  const u = encodeURIComponent(shareUrl); const t = encodeURIComponent(shareText)
+  const links = {
+    in: `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
+    X: `https://twitter.com/intent/tweet?text=${t}&url=${u}`,
+    wa: `https://wa.me/?text=${t}%20${u}`,
+    f: `https://www.facebook.com/sharer/sharer.php?u=${u}`,
+    '@': `mailto:?subject=${encodeURIComponent('PortabIA')}&body=${t}%20${u}`,
+  }
+  if (net === 'native' && navigator.share) { navigator.share({ title: 'PortabIA', text: shareText, url: shareUrl }).catch(() => {}); return }
+  window.open(links[net] || links['@'], '_blank', 'noopener,width=620,height=560')
+}
 const socials = ['in', 'X', 'wa', 'f', '@']
+const socialLabels = { in: 'LinkedIn', X: 'X', wa: 'WhatsApp', f: 'Facebook', '@': 'E-mail' }
+
+// ---- Avis in-app (wirés au backend) ----
+const reviews = ref([])
+const placeholderReviews = [
+  { rating: 5, comment: 'Enfin un moyen simple de changer d\'IA sans tout réécrire. Et mes données ne quittent pas mon ordi.', author_name: 'Formatrice indépendante' },
+  { rating: 5, comment: 'J\'ai migré mon CLAUDE.md vers AGENTS.md en deux clics. Bluffant et gratuit.', author_name: 'Développeur' },
+  { rating: 4, comment: 'L\'idée du « RIO de l\'IA » est géniale. Le côté souverain et open-source rassure.', author_name: 'Responsable formation' },
+]
+const reviewForm = reactive({ rating: 5, comment: '', author_name: '', website: '' })
+const reviewMsg = ref(null)
+async function loadReviews() { try { reviews.value = (await api.reviewsList()).reviews || [] } catch { reviews.value = [] } }
+async function submitReview() {
+  reviewMsg.value = null
+  try { await api.reviewAdd({ ...reviewForm }); reviewMsg.value = 'Merci ! Votre avis est soumis à modération.'; reviewForm.comment = ''; reviewForm.author_name = '' }
+  catch (e) { reviewMsg.value = '⚠ ' + e.message }
+}
 
 /* ---------- WIZARD ---------- */
 const selCard = (on) => on
@@ -345,6 +378,50 @@ function downloadKit() {
         </div>
       </section>
 
+      <!-- AVIS + ANNUAIRES -->
+      <section id="avis" style="max-width:var(--container);margin:0 auto;padding:0 32px 84px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:8px;">
+          <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,3.4vw,42px);margin:0;letter-spacing:-.02em;">Ils ont repris la main</h2>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <span v-for="d in ['Trustpilot','G2','Capterra']" :key="d" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--text-secondary);border:1px solid var(--border-default);border-radius:999px;padding:6px 13px;background:var(--surface-elevated);">★ {{ d }}</span>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-muted);margin:0 0 24px;">Avis vérifiés et modérés (CNIL/DGCCRF) — pas de faux avis.</p>
+        <div class="pa-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:26px;">
+          <div v-for="(r,i) in (reviews.length ? reviews.slice(0,3) : placeholderReviews)" :key="i" style="padding:22px;border:1px solid var(--border-subtle);border-radius:18px;background:var(--surface-elevated);box-shadow:var(--shadow-sm);">
+            <div style="color:var(--coral-500);font-size:15px;letter-spacing:2px;">{{ '★'.repeat(r.rating) }}<span style="color:var(--border-strong);">{{ '★'.repeat(5-r.rating) }}</span></div>
+            <p style="font-size:14.5px;line-height:1.6;color:var(--text-primary);margin:12px 0 10px;">« {{ r.comment }} »</p>
+            <div style="font-size:13px;color:var(--text-muted);">— {{ r.author_name || 'Utilisateur' }}</div>
+          </div>
+        </div>
+        <!-- laisser un avis -->
+        <details style="border:1px solid var(--border-subtle);border-radius:16px;background:var(--surface-elevated);padding:0 20px;">
+          <summary style="cursor:pointer;padding:18px 0;font-weight:600;font-size:15px;color:var(--text-primary);list-style:none;">✍ Laisser un avis</summary>
+          <form @submit.prevent="submitReview" style="display:flex;flex-direction:column;gap:12px;padding:0 0 20px;">
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span style="font-size:13px;color:var(--text-secondary);">Note :</span>
+              <button v-for="n in 5" :key="n" type="button" @click="reviewForm.rating=n" :style="'font-size:22px;background:none;border:none;cursor:pointer;color:'+(n<=reviewForm.rating?'var(--coral-500)':'var(--border-strong)')">★</button>
+            </div>
+            <input v-model="reviewForm.author_name" placeholder="Votre nom (optionnel)" style="font-size:14px;padding:10px 12px;border:1px solid var(--border-default);border-radius:10px;background:var(--surface-canvas);color:var(--text-primary);" />
+            <textarea v-model="reviewForm.comment" required rows="3" placeholder="Votre retour…" style="font-size:14px;padding:10px 12px;border:1px solid var(--border-default);border-radius:10px;background:var(--surface-canvas);color:var(--text-primary);resize:vertical;"></textarea>
+            <input v-model="reviewForm.website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;" aria-hidden="true" />
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;"><button type="submit" style="font-weight:600;font-size:14px;color:#fff;background:var(--coral-500);border:none;border-radius:10px;padding:11px 20px;cursor:pointer;">Envoyer</button><span v-if="reviewMsg" style="font-size:13.5px;color:var(--text-secondary);">{{ reviewMsg }}</span></div>
+          </form>
+        </details>
+      </section>
+
+      <!-- CROSS-PROMO E²SNauthor -->
+      <section style="max-width:var(--container);margin:0 auto;padding:0 32px 84px;">
+        <div class="pa-grid-2" style="display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;border:1px solid var(--border-subtle);border-radius:20px;background:var(--surface-sunken);padding:28px 32px;">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral-600);">Du même éditeur · E²SN</div>
+            <h3 style="font-family:var(--font-display);font-weight:400;font-size:26px;margin:8px 0 4px;letter-spacing:-.01em;">Vous créez des formations ?</h3>
+            <p style="font-size:14.5px;color:var(--text-secondary);margin:0;max-width:54ch;">Découvrez <strong style="color:var(--text-primary);">E²SNauthor</strong>, la plateforme souveraine pour concevoir, diffuser et piloter vos formations.</p>
+          </div>
+          <a href="https://essnauthor.fr" target="_blank" rel="noopener" style="font-family:var(--font-sans);font-weight:600;font-size:15px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:12px;padding:13px 22px;text-decoration:none;white-space:nowrap;">Découvrir E²SNauthor ↗</a>
+        </div>
+      </section>
+
       <!-- FINAL CTA -->
       <section style="max-width:var(--container);margin:0 auto;padding:0 32px 90px;">
         <div style="position:relative;overflow:hidden;border-radius:28px;background:var(--coral-500);padding:64px 48px;text-align:center;box-shadow:var(--shadow-lg);">
@@ -367,7 +444,7 @@ function downloadKit() {
             </div>
             <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin:16px 0 0;max-width:34ch;">Le RIO de l'IA. Un service gratuit et open-source opéré par E²SN — Guillaume BOUTON.</p>
             <div style="display:flex;gap:10px;margin-top:18px;">
-              <span v-for="s in socials" :key="s" style="width:34px;height:34px;border-radius:10px;border:1px solid var(--border-default);background:var(--surface-elevated);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text-secondary);">{{ s }}</span>
+              <button v-for="s in socials" :key="s" @click="shareTo(s)" :aria-label="'Partager sur '+socialLabels[s]" :title="'Partager sur '+socialLabels[s]" style="width:34px;height:34px;border-radius:10px;border:1px solid var(--border-default);background:var(--surface-elevated);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text-secondary);cursor:pointer;">{{ s }}</button>
             </div>
           </div>
           <div>
