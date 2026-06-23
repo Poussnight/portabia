@@ -6,6 +6,8 @@ import { ref, reactive, computed } from 'vue'
 import { makeExportPrompt, makeImport, actionMetadata } from './engine.js'
 import { downloadBridge } from './download/bundle.js'
 import { LEGAL } from './content/legal.js'
+import { parseChatgptExport } from './transform/chatgptExport.js'
+import { parseRulesFile, aiFromFilename } from './transform/mdRules.js'
 
 const AIS = [
   { id: 'claude',  name: 'Claude',  mark: 'Cl', color: '#C8643F' },
@@ -111,6 +113,28 @@ const selectedList = computed(() => ITEMS.filter((it) => items[it.id]))
 const src = computed(() => byId(source.value))
 const tgt = computed(() => byId(target.value))
 
+// ---- Mode B : import d'un fichier d'export (optionnel) ----
+const uploadedBundle = ref(null)
+const uploadInfo = ref(null)
+const uploadError = ref(null)
+async function onFile(ev) {
+  uploadError.value = null; uploadInfo.value = null; uploadedBundle.value = null
+  const file = ev.target.files?.[0]
+  if (!file) return
+  try {
+    const text = await file.text()
+    const isJson = file.name.toLowerCase().endsWith('.json')
+    const res = isJson ? parseChatgptExport(text) : parseRulesFile(text, file.name)
+    uploadedBundle.value = res.bundle
+    uploadInfo.value = isJson
+      ? `${res.stats.conversations_kept} conversation(s), ${res.stats.messages} messages importés`
+      : `Fichier de règles importé (${aiFromFilename(file.name)})`
+  } catch (e) {
+    uploadError.value = e.message || 'Fichier non reconnu'
+  }
+  ev.target.value = ''
+}
+
 function buildSelection() {
   const axes = {}
   for (const it of ITEMS) if (items[it.id]) axes[it.axis] = { on: true, mode: it.axis === 'conversation' ? 'summary' : undefined }
@@ -134,9 +158,10 @@ function downloadKit() {
   const tAi = engineId(target.value)
   const ts = new Date().toISOString()
   const exportPrompt = makeExportPrompt(sAi, selection)
-  // Bundle squelette (l'IA source le remplira) → on génère déjà le fichier natif + prompt d'import
-  const skeleton = { spec_version: '1.0', meta: { source_ai: sAi, scope: 'total' }, axes: Object.fromEntries(Object.keys(selection.axes).map((k) => [k, {}])) }
-  const { nativeFile, importPrompt } = makeImport({ bundle: skeleton, targetAi: tAi, timestamp: ts, anonymize: { secrets: true, emails: true, paths: true } })
+  // Mode B : si un fichier d'export a été déposé, on porte le contenu RÉEL.
+  // Sinon Mode A : bundle squelette que l'IA source remplira via le prompt d'export.
+  const baseBundle = uploadedBundle.value || { spec_version: '1.0', meta: { source_ai: sAi, scope: 'total' }, axes: Object.fromEntries(Object.keys(selection.axes).map((k) => [k, {}])) }
+  const { nativeFile, importPrompt } = makeImport({ bundle: baseBundle, targetAi: tAi, timestamp: ts, anonymize: { secrets: true, emails: true, paths: true } })
   const meta = actionMetadata({ sourceAi: sAi, targetAi: tAi, selection, timestamp: ts })
   downloadBridge({ meta, exportPrompt, importPrompt, nativeFile, selection })
 }
@@ -401,6 +426,21 @@ function downloadKit() {
             <span :style="'width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;'+it.boxStyle">{{ it.check }}</span>
             <span><span style="display:block;font-size:16px;font-weight:600;color:var(--text-primary);">{{ it.title }}</span><span style="display:block;font-size:13.5px;color:var(--text-secondary);margin-top:2px;">{{ it.body }}</span></span>
           </button>
+        </div>
+        <!-- Mode B : import direct d'un fichier d'export (optionnel) -->
+        <div style="margin-top:18px;padding:18px 20px;border:1px dashed var(--border-strong);border-radius:14px;background:var(--surface-sunken);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:14.5px;font-weight:600;color:var(--text-primary);">Vous avez un fichier d'export ? <span style="font-weight:400;color:var(--text-muted);">(optionnel)</span></div>
+              <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">Déposez votre <code style="font-family:var(--font-mono);font-size:12px;">conversations.json</code> (ChatGPT) ou un fichier de règles (CLAUDE.md, AGENTS.md…) pour une migration directe, traitée dans votre navigateur.</div>
+            </div>
+            <label style="font-family:var(--font-sans);font-weight:600;font-size:14px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:10px;padding:10px 16px;cursor:pointer;white-space:nowrap;">
+              Choisir un fichier
+              <input type="file" accept=".json,.md,.txt,.cursorrules" @change="onFile" style="display:none;" />
+            </label>
+          </div>
+          <div v-if="uploadInfo" style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13.5px;color:var(--success);font-weight:500;"><span>✓</span>{{ uploadInfo }} · traité localement</div>
+          <div v-if="uploadError" style="margin-top:12px;font-size:13.5px;color:var(--danger,#c0392b);">⚠ {{ uploadError }}</div>
         </div>
       </template>
 
