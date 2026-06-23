@@ -1,0 +1,9 @@
+# PortabIA — robots.txt
+# En préversion (preview.essn.fr) : NON indexable. À remplacer au lancement public.
+User-agent: *
+Disallow: /
+
+# Au lancement public, autoriser et exposer le sitemap :
+# User-agent: *
+# Allow: /
+# Sitemap: https://<domaine-public>/sitemap.xml

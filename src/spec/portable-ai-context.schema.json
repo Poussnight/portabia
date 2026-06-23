@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://preview.essn.fr/spec/portable-ai-context-v1.json",
+  "title": "E²SN Portable AI Context Spec v1",
+  "description": "Format pivot neutre et ouvert pour la portabilité de contexte/historique entre assistants IA. Conçu par E²SN — Guillaume BOUTON. Licence Apache-2.0.",
+  "type": "object",
+  "required": ["spec_version", "meta", "axes"],
+  "properties": {
+    "spec_version": { "const": "1.0" },
+    "meta": {
+      "type": "object",
+      "required": ["source_ai", "target_ai", "generated_at"],
+      "properties": {
+        "source_ai": { "type": "string", "enum": ["claude", "openai", "gemini", "mistral", "grok", "unknown"] },
+        "target_ai": { "type": "string", "enum": ["claude", "openai", "gemini", "mistral", "grok"] },
+        "generated_at": { "type": "string", "description": "ISO 8601 (fourni par l'appelant, jamais Date.now côté spec)" },
+        "scope": { "type": "string", "enum": ["partial", "total"] },
+        "anonymized": { "type": "boolean" },
+        "generator": { "type": "string", "default": "PortabIA by E²SN" }
+      }
+    },
+    "axes": {
+      "type": "object",
+      "description": "Les 3 axes de contenu. Chaque axe est optionnel (granularité au cas par cas).",
+      "properties": {
+        "code_config": {
+          "type": "object",
+          "description": "Axe 1 — Code & configuration d'agent.",
+          "properties": {
+            "rules": { "type": "string", "description": "Règles/instructions projet (corps type CLAUDE.md/AGENTS.md)." },
+            "conventions": { "type": "string" },
+            "mcp_servers": { "type": "array", "items": { "type": "object" } },
+            "slash_commands": { "type": "array", "items": { "type": "object" } },
+            "skills": { "type": "array", "items": { "type": "object" } },
+            "settings": { "type": "object" }
+          }
+        },
+        "conversation": {
+          "type": "object",
+          "description": "Axe 2 — Historique conversationnel.",
+          "properties": {
+            "mode": { "type": "string", "enum": ["raw", "summary", "decisions"], "default": "summary" },
+            "summary": { "type": "string", "description": "Briefing/handoff structuré (recommandé)." },
+            "messages": { "type": "array", "items": {
+              "type": "object",
+              "properties": { "role": { "type": "string" }, "content": { "type": "string" }, "ts": { "type": "string" } }
+            } },
+            "decisions": { "type": "array", "items": { "type": "string" } },
+            "artifacts": { "type": "array", "items": { "type": "object" } }
+          }
+        },
+        "project": {
+          "type": "object",
+          "description": "Axe 3 — Historique & état de projet.",
+          "properties": {
+            "goals": { "type": "array", "items": { "type": "string" } },
+            "decisions_log": { "type": "array", "items": { "type": "object" } },
+            "status": { "type": "string" },
+            "open_tasks": { "type": "array", "items": { "type": "string" } },
+            "glossary": { "type": "array", "items": { "type": "object" } },
+            "memory": { "type": "array", "items": { "type": "object" } },
+            "file_map": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}

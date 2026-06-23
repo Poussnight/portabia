@@ -1,0 +1,25 @@
+# Dépendances
+node_modules/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+
+# Build
+dist/
+.vite/
+
+# Secrets / env — JAMAIS committer
+.env
+.env.*
+!.env.example
+*.bak
+*.bak-*
+
+# Logs
+*.log
+backend/logs/
+
+# OS / éditeurs
+.DS_Store
+.idea/
+.vscode/

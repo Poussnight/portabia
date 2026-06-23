@@ -1,0 +1,26 @@
+{
+  "name": "portabia",
+  "version": "0.1.0",
+  "description": "PortabIA — outil universel, gratuit et open-source de portabilité d'historique/contexte IA (le « RIO de l'IA »). Conçu par E²SN — Guillaume BOUTON.",
+  "license": "Apache-2.0",
+  "author": "E²SN — Guillaume BOUTON",
+  "homepage": "https://preview.essn.fr",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "vue-i18n": "^9.14.5",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8"
+  }
+}

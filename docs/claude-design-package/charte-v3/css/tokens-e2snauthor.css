@@ -1,0 +1,330 @@
+/* ============================================================
+   E²SNauthor — Design tokens
+   Palette OKLCH unifiée + accents par sous-marque
+   ============================================================ */
+
+:root {
+  /* ---------- Navy primary ---------- */
+  --navy-50:  oklch(98% 0.010 248);
+  --navy-100: oklch(95% 0.018 248);
+  --navy-200: oklch(89% 0.032 248);
+  --navy-300: oklch(78% 0.056 248);
+  --navy-400: oklch(62% 0.090 248);
+  --navy-500: oklch(46% 0.120 248);
+  --navy-600: oklch(36% 0.110 248);
+  --navy-700: oklch(28% 0.092 248);
+  --navy-800: oklch(22% 0.070 248);
+  --navy-900: oklch(17% 0.050 248);
+  --navy-950: oklch(11% 0.035 248);
+
+  /* ---------- Coral / Terre ---------- */
+  --coral-50:  oklch(97% 0.014 36);
+  --coral-100: oklch(94% 0.028 36);
+  --coral-200: oklch(88% 0.060 36);
+  --coral-300: oklch(80% 0.100 36);
+  --coral-400: oklch(72% 0.130 32);
+  --coral-500: oklch(64% 0.150 30);
+  --coral-600: oklch(55% 0.145 28);
+  --coral-700: oklch(45% 0.125 26);
+  --coral-800: oklch(35% 0.090 26);
+  --coral-900: oklch(25% 0.060 26);
+
+  /* ---------- Marketplace accent (alias coral) ----------
+     La marketplace n'est pas une 5e sous-marque : elle réutilise l'accent
+     coral de la home. On expose des alias --marketplace-* pour que les
+     composants génériques (ProductHero, CapabilitiesGrid, CrossSellRow)
+     qui consomment var(--<brand>-XXX) fonctionnent avec brand="marketplace". */
+  --marketplace-50:  var(--coral-50);
+  --marketplace-100: var(--coral-100);
+  --marketplace-200: var(--coral-200);
+  --marketplace-300: var(--coral-300);
+  --marketplace-400: var(--coral-400);
+  --marketplace-500: var(--coral-500);
+  --marketplace-600: var(--coral-600);
+  --marketplace-700: var(--coral-700);
+  --marketplace-800: var(--coral-800);
+  --marketplace-900: var(--coral-900);
+
+  /* ---------- Stone neutrals (warm) ---------- */
+  --stone-50:  oklch(98.5% 0.004 70);
+  --stone-100: oklch(96.5% 0.006 65);
+  --stone-150: oklch(94% 0.008 60);
+  --stone-200: oklch(91% 0.010 55);
+  --stone-300: oklch(83% 0.013 55);
+  --stone-400: oklch(68% 0.014 55);
+  --stone-500: oklch(52% 0.013 55);
+  --stone-600: oklch(40% 0.012 55);
+  --stone-700: oklch(30% 0.010 55);
+  --stone-800: oklch(22% 0.008 55);
+  --stone-900: oklch(14% 0.006 55);
+
+  /* ---------- Sub-brand accents (OKLCH, alignés Studio in-app) ---------- */
+  /* Lyra — IA agentique, ember orange chaleureux */
+  --lyra-50:  oklch(97% 0.025 30);
+  --lyra-100: oklch(93% 0.060 30);
+  --lyra-200: oklch(86% 0.110 30);
+  --lyra-400: oklch(76% 0.150 30);
+  --lyra-500: oklch(68% 0.165 30);
+  --lyra-600: oklch(58% 0.155 28);
+  --lyra-700: oklch(48% 0.135 26);
+  --lyra-900: oklch(28% 0.080 28);
+
+  /* Studio — canvas spark blue */
+  --studio-50:  oklch(97% 0.020 210);
+  --studio-100: oklch(93% 0.050 205);
+  --studio-200: oklch(86% 0.090 200);
+  --studio-400: oklch(70% 0.130 198);
+  --studio-500: oklch(62% 0.135 200);
+  --studio-600: oklch(54% 0.130 202);
+  --studio-700: oklch(44% 0.115 205);
+  --studio-900: oklch(26% 0.070 208);
+
+  /* LCMS — diffusion innovation violet */
+  --lcms-50:  oklch(97% 0.020 295);
+  --lcms-100: oklch(93% 0.055 295);
+  --lcms-200: oklch(85% 0.110 295);
+  --lcms-400: oklch(68% 0.170 295);
+  --lcms-500: oklch(60% 0.180 295);
+  --lcms-600: oklch(52% 0.170 295);
+  --lcms-700: oklch(42% 0.140 295);
+  --lcms-900: oklch(26% 0.090 295);
+
+  /* Pilot — administration growth green */
+  --pilot-50:  oklch(97% 0.025 155);
+  --pilot-100: oklch(93% 0.060 155);
+  --pilot-200: oklch(86% 0.105 155);
+  --pilot-400: oklch(74% 0.135 155);
+  --pilot-500: oklch(66% 0.140 155);
+  --pilot-600: oklch(50% 0.135 155); /* assombri pour WCAG AA 4.5:1 sur blanc (était 56% → 4.38:1) */
+  --pilot-700: oklch(44% 0.110 155);
+  --pilot-900: oklch(26% 0.070 155);
+
+  /* ---------- Semantic ---------- */
+  --success: oklch(58% 0.110 155);
+  --warning: oklch(72% 0.135 75);
+  --danger:  oklch(58% 0.180 25);
+  --info:    oklch(58% 0.110 230);
+
+  /* ---------- Surfaces (light warm by default) ---------- */
+  --surface-canvas:     var(--stone-50);
+  --surface-elevated:   #ffffff;
+  --surface-sunken:     var(--stone-100);
+  --surface-warm:       oklch(98% 0.008 65);
+  --surface-inverse:    var(--navy-900);
+  --surface-ink:        var(--navy-950);
+
+  --border-subtle:      oklch(91% 0.010 55 / .9);
+  --border-default:     oklch(86% 0.014 55);
+  --border-strong:      oklch(72% 0.018 55);
+  --border-inverse:     oklch(28% 0.060 248);
+
+  /* ---------- Text ---------- */
+  --text-primary:       var(--navy-900);
+  --text-secondary:     var(--stone-700);
+  --text-muted:         oklch(45% 0.013 55);
+  --text-tertiary:      oklch(55% 0.013 55);
+  --text-inverse:       var(--stone-50);
+  --text-accent:        var(--coral-700);
+  --text-on-dark:       oklch(95% 0.008 60);
+  --text-on-dark-muted: oklch(78% 0.014 55);
+
+  /* ---------- Typography ---------- */
+  --font-display: "Instrument Serif", "Times New Roman", Georgia, serif;
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+
+  --fs-eyebrow:   0.6875rem; /* 11 */
+  --fs-caption:   0.8125rem; /* 13 */
+  --fs-body-sm:   0.875rem;  /* 14 */
+  --fs-body:      1rem;      /* 16 */
+  --fs-body-lg:   1.125rem;  /* 18 */
+  --fs-lead:      1.375rem;  /* 22 */
+  --fs-h5:        1.25rem;   /* 20 */
+  --fs-h4:        1.625rem;  /* 26 */
+  --fs-h3:        2.125rem;  /* 34 */
+  --fs-h2:        3rem;      /* 48 */
+  --fs-h1:        4.5rem;    /* 72 */
+  --fs-display:   6.5rem;    /* 104 */
+
+  --lh-tight:    1.02;
+  --lh-snug:     1.18;
+  --lh-normal:   1.5;
+  --lh-relaxed:  1.65;
+
+  --tracking-tightest: -0.045em;
+  --tracking-tight:    -0.022em;
+  --tracking-normal:   0;
+  --tracking-wide:     0.04em;
+  --tracking-eyebrow:  0.16em;
+
+  /* ---------- Spacing 8pt ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+  --space-40: 160px;
+
+  /* ---------- Radii ---------- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-3xl: 36px;
+  --radius-pill: 999px;
+
+  /* ---------- Shadows ---------- */
+  --shadow-xs: 0 1px 2px rgb(23 30 65 / 0.04);
+  --shadow-sm: 0 2px 4px rgb(23 30 65 / 0.06), 0 1px 2px rgb(23 30 65 / 0.04);
+  --shadow-md: 0 8px 16px -4px rgb(23 30 65 / 0.08), 0 2px 6px rgb(23 30 65 / 0.04);
+  --shadow-lg: 0 24px 48px -12px rgb(23 30 65 / 0.14), 0 4px 12px rgb(23 30 65 / 0.06);
+  --shadow-xl: 0 40px 80px -20px rgb(23 30 65 / 0.18);
+  --shadow-2xl: 0 60px 120px -30px rgb(23 30 65 / 0.24);
+  --shadow-glow-coral: 0 0 0 1px oklch(64% 0.150 30 / .25), 0 12px 32px oklch(64% 0.150 30 / .22);
+  --shadow-glow-navy:  0 0 0 1px oklch(46% 0.120 248 / .30), 0 12px 32px oklch(46% 0.120 248 / .22);
+
+  /* ---------- Motion ---------- */
+  --motion-enter:  140ms;
+  --motion-hover:  200ms;
+  --motion-exit:   280ms;
+  --motion-reveal: 380ms;
+
+  --ease-out:      cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out:   cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring:   cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  --dur-fast: 160ms;
+  --dur-base: 240ms;
+  --dur-slow: 480ms;
+
+  /* ---------- Layout ---------- */
+  --container:        1240px;
+  --container-narrow: 880px;
+  --container-wide:   1440px;
+
+  /* ---------- Glass (réservé player vidéo + modale démo) ---------- */
+  --glass-bg:           rgba(255,255,255,0.08);
+  --glass-bg-strong:    rgba(255,255,255,0.14);
+  --glass-border:       rgba(255,255,255,0.18);
+  --glass-blur:         saturate(140%) blur(18px);
+
+  /* ---------- Active accent (set dynamically per page) ---------- */
+  --accent-50:  var(--coral-50);
+  --accent-100: var(--coral-100);
+  --accent-200: var(--coral-200);
+  --accent-400: var(--coral-400);
+  --accent-500: var(--coral-500);
+  --accent-600: var(--coral-600);
+  --accent-700: var(--coral-700);
+  --accent-900: var(--coral-900);
+}
+
+/* ---------- Per-page accent scopes ---------- */
+[data-accent="lyra"] {
+  --accent-50:  var(--lyra-50);
+  --accent-100: var(--lyra-100);
+  --accent-200: var(--lyra-200);
+  --accent-400: var(--lyra-400);
+  --accent-500: var(--lyra-500);
+  --accent-600: var(--lyra-600);
+  --accent-700: var(--lyra-700);
+  --accent-900: var(--lyra-900);
+}
+[data-accent="studio"] {
+  --accent-50:  var(--studio-50);
+  --accent-100: var(--studio-100);
+  --accent-200: var(--studio-200);
+  --accent-400: var(--studio-400);
+  --accent-500: var(--studio-500);
+  --accent-600: var(--studio-600);
+  --accent-700: var(--studio-700);
+  --accent-900: var(--studio-900);
+}
+[data-accent="lcms"] {
+  --accent-50:  var(--lcms-50);
+  --accent-100: var(--lcms-100);
+  --accent-200: var(--lcms-200);
+  --accent-400: var(--lcms-400);
+  --accent-500: var(--lcms-500);
+  --accent-600: var(--lcms-600);
+  --accent-700: var(--lcms-700);
+  --accent-900: var(--lcms-900);
+}
+[data-accent="pilot"] {
+  --accent-50:  var(--pilot-50);
+  --accent-100: var(--pilot-100);
+  --accent-200: var(--pilot-200);
+  --accent-400: var(--pilot-400);
+  --accent-500: var(--pilot-500);
+  --accent-600: var(--pilot-600);
+  --accent-700: var(--pilot-700);
+  --accent-900: var(--pilot-900);
+}
+[data-accent="marketplace"] {
+  --accent-50:  var(--coral-50);
+  --accent-100: var(--coral-100);
+  --accent-200: var(--coral-200);
+  --accent-400: var(--coral-400);
+  --accent-500: var(--coral-500);
+  --accent-600: var(--coral-600);
+  --accent-700: var(--coral-700);
+  --accent-900: var(--coral-900);
+}
+
+/* ---------- Dark premium glassmorphism theme ---------- */
+[data-theme="dark"] {
+  --surface-canvas: oklch(13% 0.040 248);
+  --surface-elevated: oklch(18% 0.050 248);
+  --surface-sunken: oklch(10% 0.030 248);
+  --surface-warm: oklch(15% 0.040 248);
+  --surface-1: oklch(18% 0.050 248);
+  --surface-2: oklch(15% 0.040 248);
+  --surface-inverse: var(--stone-50);
+  --border-subtle: rgba(255,255,255,0.08);
+  --border-default: rgba(255,255,255,0.12);
+  --border-strong: rgba(255,255,255,0.20);
+  --text: oklch(96% 0.008 60);
+  --text-primary: oklch(96% 0.008 60);
+  --text-secondary: oklch(82% 0.014 55);
+  --text-muted: oklch(72% 0.018 55);
+  --text-tertiary: oklch(60% 0.018 55);
+  --glass-bg: rgba(255,255,255,0.06);
+  --glass-bg-strong: rgba(255,255,255,0.10);
+  --glass-border: rgba(255,255,255,0.14);
+
+  /* Brand accent tokens : -700 trop foncés sur dark, on les remappe vers une teinte plus claire
+     (équivalent ~-300/-400) afin d'assurer le contraste 4.5:1 sur surface sombre.
+     Les utilisations en `background:` restent rares — la plupart sont des `color:` accent. */
+  --coral-700:  oklch(80% 0.105 36);   /* light: 45% → dark: 80% */
+  --coral-600:  oklch(75% 0.120 32);
+  --lyra-700:   oklch(78% 0.130 30);
+  --lyra-600:   oklch(72% 0.155 28);
+  --studio-700: oklch(76% 0.115 200);
+  --studio-600: oklch(68% 0.125 202);
+  --lcms-700:   oklch(78% 0.140 295);
+  --lcms-600:   oklch(70% 0.155 295);
+  --pilot-700:  oklch(78% 0.120 155);
+  --pilot-600:  oklch(70% 0.130 155);
+
+  --text-accent: var(--coral-300);
+}
+
+/* ---------- Reduce motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

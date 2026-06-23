@@ -1,0 +1,173 @@
+/* ============================================================
+   E2SN — Design tokens
+   Palette OKLCH · Typo · Spacing · Radii · Motion
+   ============================================================ */
+
+:root {
+  /* ---------- Navy primary (souverain, EU institutional) ---------- */
+  --navy-50:  oklch(98% 0.010 248);
+  --navy-100: oklch(95% 0.018 248);
+  --navy-200: oklch(89% 0.032 248);
+  --navy-300: oklch(78% 0.056 248);
+  --navy-400: oklch(62% 0.090 248);
+  --navy-500: oklch(46% 0.120 248);
+  --navy-600: oklch(36% 0.110 248);
+  --navy-700: oklch(28% 0.092 248);
+  --navy-800: oklch(22% 0.070 248);
+  --navy-900: oklch(17% 0.050 248);   /* brand primary */
+  --navy-950: oklch(11% 0.035 248);
+
+  /* ---------- Coral / Terre (chaleur métier, accent humain) ---------- */
+  --coral-50:  oklch(97% 0.014 36);
+  --coral-100: oklch(94% 0.028 36);
+  --coral-200: oklch(88% 0.060 36);
+  --coral-300: oklch(80% 0.100 36);
+  --coral-400: oklch(72% 0.130 32);
+  --coral-500: oklch(64% 0.150 30);   /* accent */
+  --coral-600: oklch(55% 0.145 28);
+  --coral-700: oklch(45% 0.125 26);
+  --coral-800: oklch(35% 0.090 26);
+  --coral-900: oklch(25% 0.060 26);
+
+  /* ---------- Stone neutrals (warm, anti-froid grey) ---------- */
+  --stone-50:  oklch(98.5% 0.004 70);
+  --stone-100: oklch(96.5% 0.006 65);
+  --stone-150: oklch(94% 0.008 60);
+  --stone-200: oklch(91% 0.010 55);
+  --stone-300: oklch(83% 0.013 55);
+  --stone-400: oklch(68% 0.014 55);
+  --stone-500: oklch(52% 0.013 55);
+  --stone-600: oklch(40% 0.012 55);
+  --stone-700: oklch(30% 0.010 55);
+  --stone-800: oklch(22% 0.008 55);
+  --stone-900: oklch(14% 0.006 55);
+
+  /* ---------- Semantic (sobres) ---------- */
+  --success: oklch(58% 0.110 155);
+  --warning: oklch(72% 0.135 75);
+  --danger:  oklch(58% 0.180 25);
+  --info:    oklch(58% 0.110 230);
+
+  /* ---------- Surfaces (mode light pilote) ---------- */
+  --surface-canvas:     var(--stone-50);
+  --surface-elevated:   #ffffff;
+  --surface-sunken:     var(--stone-100);
+  --surface-inverse:    var(--navy-900);
+  --surface-ink:        var(--navy-950);
+
+  --border-subtle:      oklch(91% 0.010 55 / .9);
+  --border-default:     oklch(86% 0.014 55);
+  --border-strong:      oklch(72% 0.018 55);
+  --border-inverse:     oklch(28% 0.060 248);
+
+  /* ---------- Text ---------- */
+  --text-primary:       var(--navy-900);
+  --text-secondary:     var(--stone-700);
+  --text-muted:         oklch(45% 0.013 55); /* Renforcé pour ratio WCAG AA confortable sur stone-50 (était stone-500 oklch 52% = limite 4.5:1) */
+  --text-inverse:       var(--stone-50);
+  --text-on-coral:      var(--navy-900);
+  --text-accent:        var(--coral-700);
+
+  /* ---------- Typography ---------- */
+  --font-display: "Instrument Serif", "Times New Roman", Georgia, serif;
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+
+  /* Modular scale, 8pt grid, generous line-heights */
+  --fs-eyebrow:      0.75rem;   /* 12 */
+  --fs-caption:      0.8125rem; /* 13 */
+  --fs-body-sm:      0.875rem;  /* 14 */
+  --fs-body:         1rem;      /* 16 */
+  --fs-body-lg:      1.125rem;  /* 18 */
+  --fs-lead:         1.375rem;  /* 22 */
+  --fs-h5:           1.25rem;   /* 20 */
+  --fs-h4:           1.625rem;  /* 26 */
+  --fs-h3:           2.125rem;  /* 34 */
+  --fs-h2:           2.875rem;  /* 46 */
+  --fs-h1:           4.25rem;   /* 68 */
+  --fs-display:      6rem;      /* 96 */
+
+  --lh-tight:    1.05;
+  --lh-snug:     1.2;
+  --lh-normal:   1.5;
+  --lh-relaxed:  1.65;
+  --lh-loose:    1.8;
+
+  --tracking-tight:  -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-eyebrow: 0.14em;
+
+  /* ---------- Spacing scale (8pt) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+  --space-40: 160px;
+
+  /* ---------- Radii ---------- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 999px;
+
+  /* ---------- Shadows (subtle, premium) ---------- */
+  --shadow-xs: 0 1px 2px rgb(23 30 65 / 0.04);
+  --shadow-sm: 0 2px 4px rgb(23 30 65 / 0.06), 0 1px 2px rgb(23 30 65 / 0.04);
+  --shadow-md: 0 8px 16px -4px rgb(23 30 65 / 0.08), 0 2px 6px rgb(23 30 65 / 0.04);
+  --shadow-lg: 0 24px 48px -12px rgb(23 30 65 / 0.14), 0 4px 12px rgb(23 30 65 / 0.06);
+  --shadow-xl: 0 40px 80px -20px rgb(23 30 65 / 0.18);
+  --shadow-glow-coral: 0 0 0 1px oklch(64% 0.150 30 / .25), 0 8px 28px oklch(64% 0.150 30 / .18);
+  --shadow-glow-navy:  0 0 0 1px oklch(46% 0.120 248 / .30), 0 12px 32px oklch(46% 0.120 248 / .22);
+
+  /* ---------- Motion ---------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --dur-fast: 160ms;
+  --dur-base: 240ms;
+  --dur-slow: 480ms;
+  --dur-narrative: 900ms;
+
+  /* ---------- Layout ---------- */
+  --container: 1200px;
+  --container-narrow: 880px;
+}
+
+/* ---------- Dark surface preview ---------- */
+[data-theme="dark"] {
+  --surface-canvas: var(--navy-950);
+  --surface-elevated: var(--navy-900);
+  --surface-sunken: oklch(8% 0.030 248);
+  --surface-inverse: var(--stone-50);
+  --border-subtle: oklch(28% 0.060 248 / .6);
+  --border-default: oklch(34% 0.075 248);
+  --border-strong: oklch(48% 0.100 248);
+  --text-primary: var(--stone-50);
+  --text-secondary: oklch(75% 0.015 55);
+  --text-muted: oklch(55% 0.018 55);
+}
+
+/* ---------- Reduce motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

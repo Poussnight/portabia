@@ -1,0 +1,49 @@
+/* PortabIA — thème V3 (Claude Design). Conçu par E²SN — Guillaume BOUTON. Apache-2.0. */
+
+@font-face{font-family:'Geist';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/geist-400.woff2') format('woff2');}
+@font-face{font-family:'Geist';font-style:normal;font-weight:600;font-display:swap;src:url('../assets/fonts/geist-600.woff2') format('woff2');}
+@font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/instrument-serif-400.woff2') format('woff2');}
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:swap;src:url('../assets/fonts/instrument-serif-400-italic.woff2') format('woff2');}
+
+:root{
+  --navy-900:oklch(17% 0.050 248);--navy-950:oklch(11% 0.035 248);--navy-800:oklch(22% 0.070 248);--navy-700:oklch(28% 0.092 248);
+  --coral-300:oklch(80% 0.100 36);--coral-400:oklch(72% 0.130 32);--coral-500:oklch(64% 0.150 30);--coral-600:oklch(55% 0.145 28);--coral-700:oklch(45% 0.125 26);--coral-50:oklch(97% 0.014 36);
+  --stone-50:oklch(98.5% 0.004 70);--stone-100:oklch(96.5% 0.006 65);--stone-200:oklch(91% 0.010 55);--stone-300:oklch(83% 0.013 55);--stone-700:oklch(30% 0.010 55);
+  --success:oklch(58% 0.110 155);
+  --surface-canvas:var(--stone-50);--surface-elevated:#ffffff;--surface-sunken:var(--stone-100);
+  --border-subtle:oklch(91% 0.010 55 / .9);--border-default:oklch(86% 0.014 55);--border-strong:oklch(72% 0.018 55);
+  --text-primary:var(--navy-900);--text-secondary:var(--stone-700);--text-muted:oklch(45% 0.013 55);--text-inverse:var(--stone-50);
+  --font-display:"Instrument Serif",Georgia,serif;--font-sans:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);--ease-in-out:cubic-bezier(0.4,0,0.2,1);
+  --shadow-sm:0 2px 4px rgb(23 30 65 / 0.06),0 1px 2px rgb(23 30 65 / 0.04);
+  --shadow-md:0 8px 16px -4px rgb(23 30 65 / 0.08),0 2px 6px rgb(23 30 65 / 0.04);
+  --shadow-lg:0 24px 48px -12px rgb(23 30 65 / 0.14),0 4px 12px rgb(23 30 65 / 0.06);
+  --shadow-glow-coral:0 0 0 1px oklch(64% 0.150 30 / .35),0 8px 28px oklch(64% 0.150 30 / .20);
+  --container:1200px;
+}
+[data-theme="dark"]{
+  --surface-canvas:var(--navy-950);--surface-elevated:var(--navy-900);--surface-sunken:oklch(8% 0.030 248);
+  --border-subtle:oklch(28% 0.060 248 / .6);--border-default:oklch(34% 0.075 248);--border-strong:oklch(48% 0.100 248);
+  --text-primary:var(--stone-50);--text-secondary:oklch(75% 0.015 55);--text-muted:oklch(60% 0.018 55);
+  --shadow-lg:0 24px 48px -12px rgb(0 0 0 / 0.5),0 4px 12px rgb(0 0 0 / 0.35);
+  --shadow-md:0 8px 16px -4px rgb(0 0 0 / 0.4);
+}
+*{box-sizing:border-box;}
+body{margin:0;}
+::selection{background:var(--coral-500);color:#fff;}
+a{color:inherit;}
+@keyframes pa-flow{to{stroke-dashoffset:-200;}}
+@keyframes pa-pulse{0%,100%{transform:scale(1);opacity:.9;}50%{transform:scale(1.08);opacity:1;}}
+@keyframes pa-rise{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pa-float{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+[data-anim="off"] .pa-bridge,[data-anim="off"] .pa-node,[data-anim="off"] .pa-hub{animation:none !important;}
+.pa-bridgecard{transition:transform .2s var(--ease-out),box-shadow .2s;}
+.pa-bridgecard:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}}
+@media (max-width:880px){
+  .pa-hero-grid{grid-template-columns:1fr !important;}
+  .pa-grid-3{grid-template-columns:1fr !important;}
+  .pa-grid-2{grid-template-columns:1fr !important;}
+  .pa-footer-grid{grid-template-columns:1fr 1fr !important;}
+  .pa-nav-links{display:none !important;}
+}

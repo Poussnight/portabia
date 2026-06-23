@@ -1,0 +1,168 @@
+/* ═══════════════════════════════════════════════════════════
+   ESSN Design System — Charte graphique officielle
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* Colors — ESSN Brand */
+  --essn-primary: #587AC1;
+  --essn-primary-light: #7B9BD4;
+  --essn-primary-dark: #3D5A9E;
+  --essn-accent: #FF8389;
+  --essn-accent-light: #FFB3B7;
+  --essn-accent-dark: #E0646A;
+  --essn-navy: #F1F5F9;
+  --essn-text: #E2E8F0;
+  --essn-text-light: #94A3B8;
+  --essn-bg: #0F172A;
+  --essn-bg-alt: #1E293B;
+  --essn-border: #334155;
+  --essn-heading-accent: #FF8389;
+
+  /* Semantic */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Typography */
+  --font-heading: 'Nunito', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Layout */
+  --max-width: 1200px;
+  --nav-height: 72px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+
+  /* Dark surface & contrast (WCAG AA) */
+  --bg-dark: #0F172A;
+  --bg-darker: #020617;
+  --text-on-dark: #F1F5F9;
+  --text-on-dark-muted: #CBD5E1;
+  --text-on-dark-heading: #FFFFFF;
+  --badge-bg: rgba(248, 113, 113, 0.15);
+  --badge-text: #FCA5A5;
+  --badge-border: rgba(248, 113, 113, 0.3);
+  --border-dark: #475569;
+
+  /* Transitions */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+
+  /* ═══════════════════════════════════════════════════════════════
+     Palette étendue (additive) — Avril 2026
+     Enrichit la palette sans remplacer les couleurs ESSN existantes.
+     ═══════════════════════════════════════════════════════════════ */
+
+  /* Navy sombre — hiérarchie 3 niveaux pour fonds et cards */
+  --color-navy:         #0b1628;
+  --color-navy-mid:     #142240;
+  --color-navy-card:    #1a2d52;
+  --color-navy-border:  rgba(59, 130, 246, 0.15);
+
+  /* Bleus — CTA, liens, accents structurels */
+  --color-blue-elec:    #2563eb;
+  --color-blue-bright:  #3b82f6;
+  --color-blue-light:   #93c5fd;
+  --color-blue-surface: #eff6ff;
+
+  /* Cyan — badges eyebrow, icônes feature, trust bar */
+  --color-cyan:         #06b6d4;
+  --color-cyan-light:   #67e8f9;
+  --color-cyan-bg:      rgba(6, 182, 212, 0.10);
+  --color-cyan-border:  rgba(6, 182, 212, 0.25);
+
+  /* Coral-soft — complément de l'accent existant (--essn-accent) */
+  --color-coral-soft:   #fb7185;
+  --color-coral-bg:     rgba(244, 63, 94, 0.10);
+  --color-coral-border: rgba(244, 63, 94, 0.25);
+
+  /* Violet — 4e pilier (R&D / recherche) */
+  --color-purple:       #a78bfa;
+  --color-purple-bg:    rgba(167, 139, 250, 0.10);
+  --color-purple-border: rgba(167, 139, 250, 0.25);
+
+  /* Texte sur fond sombre — contraste WCAG AA garanti */
+  --text-on-dark-body:    #cbd5e1;  /* body text lisible (remplace slate-400/500) */
+  --text-on-dark-meta:    #94a3b8;  /* dates, sources, metadata */
+  --text-on-dark-muted:   #64748b;  /* disabled, watermarks */
+
+  /* Texte sur fond clair */
+  --text-on-light-title:  #0f172a;
+  --text-on-light-body:   #475569;
+
+  /* Surfaces claires pour alternance de sections */
+  --color-surface-white:  #ffffff;
+  --color-surface-light:  #f8fafc;
+  --color-surface-border: #e2e8f0;
+
+  /* Gradients réutilisables */
+  --gradient-hero:        linear-gradient(105deg, rgba(11,22,40,0.94) 40%, rgba(6,182,212,0.08) 100%);
+  --gradient-cta:         linear-gradient(135deg, #1e3a8a 0%, #0e7490 100%);
+  --gradient-stat-accent: linear-gradient(90deg, #3b82f6, #06b6d4);
+  --gradient-brand:       linear-gradient(135deg, var(--essn-primary) 0%, var(--essn-primary-light) 100%);
+
+  /* Accents de cards — 4 couleurs pour différencier les piliers */
+  --accent-blue:   var(--color-blue-bright);
+  --accent-cyan:   var(--color-cyan);
+  --accent-coral:  var(--color-coral-soft);
+  --accent-purple: var(--color-purple);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --essn-bg: #0f172a;
+    --essn-bg-alt: #1e293b;
+    --essn-text: #e2e8f0;
+    --essn-text-light: #94a3b8;
+    --essn-border: #334155;
+    --essn-navy: #F1F5F9;
+    --essn-heading-accent: #FF8389;
+    --essn-primary-dark: #93B4E8;
+  }
+}
+
+html.dark {
+  --essn-bg: #0f172a;
+  --essn-bg-alt: #1e293b;
+  --essn-text: #e2e8f0;
+  --essn-text-light: #94a3b8;
+  --essn-border: #334155;
+  --essn-navy: #F1F5F9;
+  --essn-heading-accent: #FF8389;
+  --essn-primary-dark: #93B4E8;
+}
