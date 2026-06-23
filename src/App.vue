@@ -291,22 +291,31 @@ function downloadKit() {
     <!-- HEADER -->
     <header style="position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:color-mix(in srgb,var(--surface-canvas) 80%,transparent);border-bottom:1px solid var(--border-subtle);">
       <div style="max-width:var(--container);margin:0 auto;padding:14px 32px;display:flex;align-items:center;gap:28px;">
-        <button @click="goHome" aria-label="PortabIA — accueil" style="display:flex;align-items:center;gap:12px;background:none;border:none;cursor:pointer;padding:0;">
-          <span style="width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,#E08763,#C9603F);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(201,96,63,.28);flex:none;">
-            <span style="position:relative;font-family:var(--font-display);font-weight:700;font-size:19px;line-height:1;color:#FCFAF7;">E<span style="position:absolute;top:-3px;right:-8px;font-size:10px;">2</span></span>
-            <span style="font-family:var(--font-sans);font-weight:700;font-size:8px;letter-spacing:.12em;color:#FCFAF7;margin-top:2px;">SN</span>
-          </span>
+        <button @click="goHome" aria-label="PortabIA — accueil" style="display:flex;align-items:center;gap:11px;background:none;border:none;cursor:pointer;padding:0;">
+          <svg width="40" height="40" viewBox="0 0 80 80" fill="none" aria-hidden="true" style="flex:none;">
+            <rect x="2" y="2" width="76" height="76" rx="18" fill="var(--navy-900)"/>
+            <text x="20" y="55" font-family="Instrument Serif" font-size="44" fill="var(--cream-50)" letter-spacing="-0.04em">E</text>
+            <text x="46" y="36" font-family="Instrument Serif" font-style="italic" font-size="22" fill="var(--coral-500)">2</text>
+            <text x="46" y="55" font-family="Geist, sans-serif" font-size="14" font-weight="600" fill="var(--stone-300)" letter-spacing="0.05em">SN</text>
+          </svg>
           <span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1;">
             <span style="font-family:var(--font-serif);font-size:26px;color:var(--text-primary);">Portab<span style="font-style:italic;color:var(--coral-600);">IA</span></span>
-            <span style="font-family:var(--font-sans);font-weight:600;font-size:9px;letter-spacing:.2em;color:var(--text-muted);text-transform:uppercase;margin-top:3px;">par E²SN</span>
+            <span style="display:inline-flex;align-items:baseline;gap:3px;font-family:var(--font-sans);font-weight:600;font-size:9px;letter-spacing:.16em;color:var(--text-muted);text-transform:uppercase;margin-top:4px;">PAR <span class="brand-mark" style="font-size:11px;letter-spacing:0;">E<span class="sup">2</span>SN</span></span>
           </span>
         </button>
-        <nav class="pa-nav-links" style="display:flex;gap:24px;margin-left:14px;">
+        <nav class="pa-nav-links" style="display:flex;align-items:center;gap:20px;margin-left:14px;">
           <a href="#how" style="font-size:14px;font-weight:500;color:var(--text-secondary);text-decoration:none;">Comment ça marche</a>
           <a href="#compat" style="font-size:14px;font-weight:500;color:var(--text-secondary);text-decoration:none;">Compatibilité</a>
-          <a href="#privacy" style="font-size:14px;font-weight:500;color:var(--text-secondary);text-decoration:none;">Confidentialité</a>
           <a href="#faq" style="font-size:14px;font-weight:500;color:var(--text-secondary);text-decoration:none;">FAQ</a>
-          <a href="https://essn.fr/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:999px;padding:6px 13px;text-decoration:none;"><span style="width:6px;height:6px;border-radius:999px;background:var(--coral-500);"></span>essn.fr ↗</a>
+          <span style="width:1px;height:20px;background:var(--border-default);"></span>
+          <a href="https://essnauthor.fr" target="_blank" rel="noopener" class="pa-ecochip" aria-label="E²SNauthor — site (nouvel onglet)">
+            <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true" style="flex:none;"><rect x="2" y="2" width="28" height="28" rx="8" fill="var(--navy-900)"/><text x="16" y="21" text-anchor="middle" font-family="Geist, sans-serif" font-weight="700" font-size="14" fill="var(--cream-50)" letter-spacing="-0.04em">E²</text><circle cx="25" cy="7" r="3" fill="var(--coral-500)"/></svg>
+            <span class="brand-mark" style="font-size:14px;">E<span class="sup">2</span>SN<span class="author-suffix">author</span></span><span class="arr">↗</span>
+          </a>
+          <a href="https://essn.fr/" target="_blank" rel="noopener" class="pa-ecochip" aria-label="E²SN — école · conseil · édition (nouvel onglet)">
+            <svg width="22" height="22" viewBox="0 0 80 80" fill="none" aria-hidden="true" style="flex:none;"><rect x="2" y="2" width="76" height="76" rx="18" fill="var(--navy-900)"/><text x="20" y="55" font-family="Instrument Serif" font-size="44" fill="var(--cream-50)" letter-spacing="-0.04em">E</text><text x="46" y="36" font-family="Instrument Serif" font-style="italic" font-size="22" fill="var(--coral-500)">2</text><text x="46" y="55" font-family="Geist, sans-serif" font-size="14" font-weight="600" fill="var(--stone-300)" letter-spacing="0.05em">SN</text></svg>
+            <span class="brand-mark" style="font-size:14px;">E<span class="sup">2</span>SN</span><span class="arr">↗</span>
+          </a>
         </nav>
         <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
           <span style="font-family:var(--font-sans);font-weight:600;font-size:12px;letter-spacing:.1em;color:var(--text-muted);">FR</span>
@@ -358,10 +367,10 @@ function downloadKit() {
                 <text :x="n.x" :y="n.y + 38 + 18" text-anchor="middle" font-family="Sora,sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)">{{ n.name }}</text>
               </g>
               <g class="pa-hub" style="transform-origin:230px 205px;animation:pa-pulse 3.4s var(--ease-in-out) infinite;">
-                <rect x="194" y="169" width="72" height="72" rx="20" fill="url(#paHub)"/>
-                <defs><linearGradient id="paHub" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E08763"/><stop offset="1" stop-color="#C9603F"/></linearGradient></defs>
-                <text x="230" y="209" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="26" fill="#FCFAF7">E²</text>
-                <text x="230" y="228" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="13" letter-spacing="0.08em" fill="#FCFAF7">SN</text>
+                <rect x="194" y="169" width="72" height="72" rx="20" fill="var(--navy-900)"/>
+                <text x="212" y="218" font-family="Instrument Serif" font-size="40" fill="var(--cream-50)" letter-spacing="-0.04em">E</text>
+                <text x="235" y="201" font-family="Instrument Serif" font-style="italic" font-size="20" fill="var(--coral-500)">2</text>
+                <text x="235" y="218" font-family="Geist,sans-serif" font-size="13" font-weight="600" fill="var(--stone-300)" letter-spacing="0.05em">SN</text>
               </g>
             </svg>
           </div>
@@ -512,8 +521,8 @@ function downloadKit() {
           <!-- Carte E²SNauthor -->
           <a href="https://essnauthor.fr" target="_blank" rel="noopener" class="pa-ecocard" style="display:flex;flex-direction:column;text-decoration:none;border:1px solid var(--border-subtle);border-left:3px solid var(--coral-500);border-radius:20px;background:var(--surface-elevated);box-shadow:var(--shadow-sm);padding:30px 32px;">
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
-              <svg width="40" height="40" viewBox="0 0 80 80" fill="none" aria-hidden="true" style="flex:none;"><rect x="2" y="2" width="76" height="76" rx="18" fill="var(--navy-900)"/><text x="20" y="55" font-family="Instrument Serif" font-size="44" fill="var(--stone-50)" letter-spacing="-0.04em">E</text><text x="46" y="36" font-family="Instrument Serif" font-style="italic" font-size="22" fill="var(--coral-500)">2</text><text x="46" y="55" font-family="Geist, sans-serif" font-size="14" font-weight="600" fill="var(--stone-300)" letter-spacing="0.05em">SN</text></svg>
-              <span style="font-family:var(--font-display);font-size:24px;letter-spacing:-.01em;color:var(--text-primary);">E²SNauthor</span>
+              <svg width="40" height="40" viewBox="0 0 32 32" aria-hidden="true" style="flex:none;"><rect x="2" y="2" width="28" height="28" rx="8" fill="var(--navy-900)"/><text x="16" y="21" text-anchor="middle" font-family="Geist, sans-serif" font-weight="700" font-size="14" fill="var(--cream-50)" letter-spacing="-0.04em">E²</text><circle cx="25" cy="7" r="3" fill="var(--coral-500)"/></svg>
+              <span class="brand-mark" style="font-size:24px;">E<span class="sup">2</span>SN<span class="author-suffix">author</span></span>
             </div>
             <div style="font-family:var(--font-sans);font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral-700);margin-bottom:8px;">La plateforme de formation</div>
             <h3 style="font-family:var(--font-display);font-weight:700;font-size:23px;line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;color:var(--text-primary);">Vous créez des formations ?</h3>
@@ -524,8 +533,8 @@ function downloadKit() {
           <!-- Carte ESSN -->
           <a href="https://essn.fr/" target="_blank" rel="noopener" class="pa-ecocard" style="display:flex;flex-direction:column;text-decoration:none;border:1px solid var(--border-subtle);border-left:3px solid var(--navy-700);border-radius:20px;background:var(--surface-elevated);box-shadow:var(--shadow-sm);padding:30px 32px;">
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
-              <svg width="40" height="40" viewBox="0 0 80 80" fill="none" aria-hidden="true" style="flex:none;"><rect x="2" y="2" width="76" height="76" rx="18" fill="var(--navy-900)"/><text x="22" y="52" font-family="Geist, sans-serif" font-size="34" font-weight="600" fill="var(--stone-50)" letter-spacing="0.02em">SN</text><circle cx="60" cy="22" r="7" fill="var(--coral-500)"/></svg>
-              <span style="font-family:var(--font-display);font-size:24px;letter-spacing:-.01em;color:var(--text-primary);">ESSN</span>
+              <svg width="40" height="40" viewBox="0 0 80 80" fill="none" aria-hidden="true" style="flex:none;"><rect x="2" y="2" width="76" height="76" rx="18" fill="var(--navy-900)"/><text x="20" y="55" font-family="Instrument Serif" font-size="44" fill="var(--cream-50)" letter-spacing="-0.04em">E</text><text x="46" y="36" font-family="Instrument Serif" font-style="italic" font-size="22" fill="var(--coral-500)">2</text><text x="46" y="55" font-family="Geist, sans-serif" font-size="14" font-weight="600" fill="var(--stone-300)" letter-spacing="0.05em">SN</text></svg>
+              <span class="brand-mark" style="font-size:24px;">E<span class="sup">2</span>SN</span>
             </div>
             <div style="font-family:var(--font-sans);font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral-700);margin-bottom:8px;">École · Conseil · Édition</div>
             <h3 style="font-family:var(--font-display);font-weight:700;font-size:23px;line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;color:var(--text-primary);">À l'origine de PortabIA.</h3>

@@ -69,6 +69,20 @@ a{color:inherit;}
 /* carte verre */
 .pa-glass{background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);box-shadow:var(--shadow-glass);}
 
+/* Wordmarks de marque — repris À L'IDENTIQUE de essnauthor.fr (SiteNav.vue) / essn.fr.
+   Original : E/SN en sans (Geist), ² + suffixe « author » en display italique coral.
+   Ici --font-display=Sora → on force --font-serif (Instrument Serif) pour ² et author, fidèle à l'original. */
+.brand-mark{font-family:var(--font-sans);font-weight:600;letter-spacing:-0.02em;color:var(--text-primary);display:inline-flex;align-items:baseline;gap:1px;}
+.brand-mark .sup{font-family:var(--font-serif);font-style:italic;font-weight:400;font-size:0.62em;color:var(--coral-600);transform:translateY(-0.45em);display:inline-block;}
+.brand-mark .author-suffix{font-family:var(--font-serif);font-style:italic;font-weight:400;color:var(--coral-600);margin-left:0.04em;}
+[data-theme="dark"] .brand-mark{color:var(--text-primary);}
+[data-theme="dark"] .brand-mark .sup,[data-theme="dark"] .brand-mark .author-suffix{color:var(--coral-300);}
+
+/* Chips écosystème dans le header (même type de bloc, cohérence E²SNauthor ↔ E²SN) */
+.pa-ecochip{display:inline-flex;align-items:center;gap:8px;padding:6px 13px 6px 8px;border:1px solid var(--border-default);border-radius:999px;background:var(--surface-elevated);text-decoration:none;transition:border-color .15s,box-shadow .15s,transform .15s;white-space:nowrap;}
+.pa-ecochip:hover{border-color:var(--coral-500);box-shadow:var(--shadow-sm);transform:translateY(-1px);}
+.pa-ecochip .arr{color:var(--text-muted);font-size:12px;}
+
 @keyframes pa-flow{to{stroke-dashoffset:-200;}}
 @keyframes pa-pulse{0%,100%{transform:scale(1);opacity:.9;}50%{transform:scale(1.08);opacity:1;}}
 @keyframes pa-rise{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
