@@ -278,6 +278,16 @@ function downloadKit() {
 <template>
   <div :data-theme="theme" style="font-family:var(--font-sans);background:var(--surface-canvas);color:var(--text-primary);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .4s ease,color .4s ease;">
 
+    <!-- BANDEAU DÉCOUVERTE E²SN (visible dès le départ) -->
+    <div style="background:var(--navy-900);color:var(--stone-200);font-size:13px;line-height:1.4;">
+      <div class="pa-promobar" style="max-width:var(--container);margin:0 auto;padding:9px 32px;display:flex;align-items:center;justify-content:center;gap:8px 20px;flex-wrap:wrap;text-align:center;">
+        <span style="opacity:.9;">Un service <strong style="color:#fff;font-weight:600;">E²SN</strong> — souveraineté &amp; interopérabilité. Découvrez aussi&nbsp;:</span>
+        <a href="https://essnauthor.fr" target="_blank" rel="noopener" style="color:var(--coral-400);text-decoration:none;font-weight:600;white-space:nowrap;">E²SNauthor (créer des formations) ↗</a>
+        <span style="opacity:.35;">·</span>
+        <a href="https://essn.fr/" target="_blank" rel="noopener" style="color:var(--coral-400);text-decoration:none;font-weight:600;white-space:nowrap;">ESSN — école · conseil · édition ↗</a>
+      </div>
+    </div>
+
     <!-- HEADER -->
     <header style="position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:color-mix(in oklab,var(--surface-canvas) 86%,transparent);border-bottom:1px solid var(--border-subtle);">
       <div style="max-width:var(--container);margin:0 auto;padding:14px 32px;display:flex;align-items:center;gap:28px;">
@@ -298,6 +308,7 @@ function downloadKit() {
           <a href="#compat" style="font-size:14px;color:var(--text-secondary);text-decoration:none;">Compatibilité</a>
           <a href="#privacy" style="font-size:14px;color:var(--text-secondary);text-decoration:none;">Confidentialité</a>
           <a href="#faq" style="font-size:14px;color:var(--text-secondary);text-decoration:none;">FAQ</a>
+          <a href="https://essn.fr/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:999px;padding:6px 13px;text-decoration:none;"><span style="width:6px;height:6px;border-radius:999px;background:var(--coral-500);"></span>essn.fr ↗</a>
         </nav>
         <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
           <span style="font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;color:var(--text-muted);">FR</span>
