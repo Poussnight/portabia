@@ -14,11 +14,11 @@ import AccountView from './components/AccountView.vue'
 import { api, getToken, setToken } from './api/client.js'
 
 const AIS = [
-  { id: 'claude',  name: 'Claude',  mark: 'Cl', color: '#C8643F' },
-  { id: 'chatgpt', name: 'ChatGPT', mark: 'Gp', color: '#0E9A78' },
-  { id: 'gemini',  name: 'Gemini',  mark: 'Ge', color: '#3B74E8' },
-  { id: 'mistral', name: 'Mistral', mark: 'Mi', color: '#E8580F' },
-  { id: 'grok',    name: 'Grok',    mark: 'Gr', color: '#1b1b1f' },
+  { id: 'claude',  name: 'Claude',  mark: 'Cl', color: '#D97757', grad: 'radial-gradient(circle at 32% 28%,#E59A6E,#D97757)' },
+  { id: 'chatgpt', name: 'ChatGPT', mark: 'Gp', color: '#10A37F', grad: 'radial-gradient(circle at 32% 28%,#3FB89E,#10A37F)' },
+  { id: 'gemini',  name: 'Gemini',  mark: 'Ge', color: '#4F86E0', grad: 'radial-gradient(circle at 32% 28%,#7BA6EC,#4F86E0)' },
+  { id: 'mistral', name: 'Mistral', mark: 'Mi', color: '#F2A93B', grad: 'radial-gradient(circle at 32% 28%,#F7C46A,#F2A93B)' },
+  { id: 'grok',    name: 'Grok',    mark: 'Gr', color: '#2A2E37', grad: 'radial-gradient(circle at 32% 28%,#565B66,#2A2E37)' },
 ]
 const byId = (id) => AIS.find((a) => a.id === id) || {}
 // base servie (/ en prod, /portabia/ en preview) — pour les assets de public/
@@ -85,7 +85,7 @@ const bridges = computed(() => [
   { from: 'chatgpt', to: 'claude',  title: 'ChatGPT → Claude',  body: 'Vos longues conversations et instructions, reprises dans Claude sans copier-coller.' },
   { from: 'claude',  to: 'gemini',  title: 'Claude → Gemini',   body: 'Projets et contexte transférés vers l’écosystème Google.' },
   { from: 'mistral', to: 'chatgpt', title: 'Mistral → ChatGPT', body: 'Changez de fournisseur souverain sans perdre votre mémoire de travail.' },
-].map((b) => ({ ...b, fromMark: byId(b.from).mark, fromStyle: `background:${byId(b.from).color}`, toMark: byId(b.to).mark, toStyle: `background:${byId(b.to).color}` })))
+].map((b) => ({ ...b, fromMark: byId(b.from).mark, fromStyle: `background:${byId(b.from).grad}`, toMark: byId(b.to).mark, toStyle: `background:${byId(b.to).grad}` })))
 function startBridge(b) { source.value = b.from; target.value = b.to; view.value = 'wizard'; step.value = 0 }
 
 const steps = [
@@ -94,10 +94,10 @@ const steps = [
   { num: '03', icon: '📥', title: 'Récupérez votre contexte', body: 'PortabIA traduit le tout dans le format de destination. Vous importez, vous reprenez où vous étiez.' },
 ]
 const guarantees = [
-  { icon: '🔒', title: 'Zéro serveur', body: 'La conversion s’exécute entièrement en local.' },
-  { icon: '🇫🇷', title: 'Hébergé en France', body: 'Le site est servi depuis l’UE, sans traceur tiers requis.' },
-  { icon: '⚖️', title: 'RGPD & IA Act', body: 'Transparence sur ce qui est transmis à chaque IA.' },
-  { icon: '</>', title: 'Open-source', body: 'Code auditable sous licence Apache-2.0.' },
+  { color: '#1F9E96', title: 'Zéro serveur', body: 'La conversion s’exécute entièrement en local.' },
+  { color: '#D97757', title: 'Hébergé en France', body: 'Le site est servi depuis l’UE, sans traceur tiers requis.' },
+  { color: '#4F86E0', title: 'RGPD & IA Act', body: 'Transparence sur ce qui est transmis à chaque IA.' },
+  { color: '#F2A93B', title: 'Open-source', body: 'Code auditable sous licence Apache-2.0.' },
 ]
 const faqsRaw = [
   { q: 'Mes données sont-elles vraiment privées ?', a: 'Oui. Toute la conversion se fait localement, dans votre navigateur. Aucun historique n’est téléversé sur un serveur — PortabIA n’a pas de base de données de vos contenus.' },
@@ -276,12 +276,12 @@ function downloadKit() {
 </script>
 
 <template>
-  <div :data-theme="theme" style="font-family:var(--font-sans);background:var(--surface-canvas);color:var(--text-primary);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .4s ease,color .4s ease;">
+  <div :data-theme="theme" class="pa-app pa-grain" style="position:relative;font-family:var(--font-sans);background:var(--surface-canvas);color:var(--text-primary);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .4s ease,color .4s ease;">
 
     <!-- BANDEAU DÉCOUVERTE E²SN (visible dès le départ) -->
-    <div style="background:var(--navy-900);color:var(--stone-200);font-size:13px;line-height:1.4;">
+    <div style="position:relative;z-index:2;background:var(--navy-900);color:var(--cream-200);font-size:13px;line-height:1.4;">
       <div class="pa-promobar" style="max-width:var(--container);margin:0 auto;padding:9px 32px;display:flex;align-items:center;justify-content:center;gap:8px 20px;flex-wrap:wrap;text-align:center;">
-        <span style="opacity:.9;">Un service <strong style="color:#fff;font-weight:600;">E²SN</strong> — souveraineté &amp; interopérabilité. Découvrez aussi&nbsp;:</span>
+        <span style="opacity:.92;">Un service <strong style="color:#fff;font-weight:600;">E²SN</strong> — souveraineté &amp; interopérabilité. Découvrez aussi&nbsp;:</span>
         <a href="https://essnauthor.fr" target="_blank" rel="noopener" style="color:var(--coral-400);text-decoration:none;font-weight:600;white-space:nowrap;">E²SNauthor (créer des formations) ↗</a>
         <span style="opacity:.35;">·</span>
         <a href="https://essn.fr/" target="_blank" rel="noopener" style="color:var(--coral-400);text-decoration:none;font-weight:600;white-space:nowrap;">ESSN — école · conseil · édition ↗</a>
@@ -289,78 +289,79 @@ function downloadKit() {
     </div>
 
     <!-- HEADER -->
-    <header style="position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:color-mix(in oklab,var(--surface-canvas) 86%,transparent);border-bottom:1px solid var(--border-subtle);">
+    <header style="position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:color-mix(in srgb,var(--surface-canvas) 80%,transparent);border-bottom:1px solid var(--border-subtle);">
       <div style="max-width:var(--container);margin:0 auto;padding:14px 32px;display:flex;align-items:center;gap:28px;">
-        <button @click="goHome" style="display:flex;align-items:center;gap:11px;background:none;border:none;cursor:pointer;padding:0;">
-          <svg width="38" height="38" viewBox="0 0 80 80" fill="none" aria-label="E2SN" style="flex:none;">
-            <rect x="2" y="2" width="76" height="76" rx="18" fill="var(--navy-900)"/>
-            <text x="20" y="55" font-family="Instrument Serif" font-size="44" fill="var(--stone-50)" letter-spacing="-0.04em">E</text>
-            <text x="46" y="36" font-family="Instrument Serif" font-style="italic" font-size="22" fill="var(--coral-500)">2</text>
-            <text x="46" y="55" font-family="Geist, sans-serif" font-size="14" font-weight="600" fill="var(--stone-300)" letter-spacing="0.05em">SN</text>
-          </svg>
+        <button @click="goHome" aria-label="PortabIA — accueil" style="display:flex;align-items:center;gap:12px;background:none;border:none;cursor:pointer;padding:0;">
+          <span style="width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,#E08763,#C9603F);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(201,96,63,.28);flex:none;">
+            <span style="position:relative;font-family:var(--font-display);font-weight:700;font-size:19px;line-height:1;color:#FCFAF7;">E<span style="position:absolute;top:-3px;right:-8px;font-size:10px;">2</span></span>
+            <span style="font-family:var(--font-sans);font-weight:700;font-size:8px;letter-spacing:.12em;color:#FCFAF7;margin-top:2px;">SN</span>
+          </span>
           <span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1;">
-            <span style="font-family:var(--font-display);font-size:25px;color:var(--text-primary);letter-spacing:-.01em;">Portab<span style="font-style:italic;color:var(--coral-500);">IA</span></span>
-            <span style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;color:var(--text-muted);text-transform:uppercase;margin-top:3px;">par E²SN</span>
+            <span style="font-family:var(--font-serif);font-size:26px;color:var(--text-primary);">Portab<span style="font-style:italic;color:var(--coral-600);">IA</span></span>
+            <span style="font-family:var(--font-sans);font-weight:600;font-size:9px;letter-spacing:.2em;color:var(--text-muted);text-transform:uppercase;margin-top:3px;">par E²SN</span>
           </span>
         </button>
         <nav class="pa-nav-links" style="display:flex;gap:24px;margin-left:14px;">
-          <a href="#how" style="font-size:14px;color:var(--text-secondary);text-decoration:none;">Comment ça marche</a>
-          <a href="#compat" style="font-size:14px;color:var(--text-secondary);text-decoration:none;">Compatibilité</a>
-          <a href="#privacy" style="font-size:14px;color:var(--text-secondary);text-decoration:none;">Confidentialité</a>
-          <a href="#faq" style="font-size:14px;color:var(--text-secondary);text-decoration:none;">FAQ</a>
+          <a href="#how" style="font-size:14px;font-weight:500;color:var(--text-secondary);text-decoration:none;">Comment ça marche</a>
+          <a href="#compat" style="font-size:14px;font-weight:500;color:var(--text-secondary);text-decoration:none;">Compatibilité</a>
+          <a href="#privacy" style="font-size:14px;font-weight:500;color:var(--text-secondary);text-decoration:none;">Confidentialité</a>
+          <a href="#faq" style="font-size:14px;font-weight:500;color:var(--text-secondary);text-decoration:none;">FAQ</a>
           <a href="https://essn.fr/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:999px;padding:6px 13px;text-decoration:none;"><span style="width:6px;height:6px;border-radius:999px;background:var(--coral-500);"></span>essn.fr ↗</a>
         </nav>
         <div style="margin-left:auto;display:flex;align-items:center;gap:12px;">
-          <span style="font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;color:var(--text-muted);">FR</span>
+          <span style="font-family:var(--font-sans);font-weight:600;font-size:12px;letter-spacing:.1em;color:var(--text-muted);">FR</span>
           <button @click="toggleTheme" aria-label="Basculer le thème" style="width:38px;height:38px;border-radius:999px;border:1px solid var(--border-default);background:var(--surface-elevated);color:var(--text-primary);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;">{{ themeIcon }}</button>
           <button @click="goAccount" style="font-family:var(--font-sans);font-weight:600;font-size:14px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:999px;padding:10px 16px;cursor:pointer;min-height:44px;">{{ currentUser ? 'Mon compte' : 'Connexion' }}</button>
-          <button @click="goWizard" style="font-family:var(--font-sans);font-weight:600;font-size:14.5px;color:#fff;background:var(--coral-500);border:none;border-radius:999px;padding:11px 20px;cursor:pointer;box-shadow:var(--shadow-sm);min-height:44px;">Migrer maintenant →</button>
+          <button @click="goWizard" style="font-family:var(--font-sans);font-weight:600;font-size:14.5px;color:#fff;background:linear-gradient(145deg,#E08763,#C9603F);border:none;border-radius:999px;padding:11px 20px;cursor:pointer;box-shadow:var(--shadow-glow-coral);min-height:44px;">Migrer maintenant →</button>
         </div>
       </div>
     </header>
 
     <!-- ===== LANDING ===== -->
-    <main v-if="view==='landing'">
+    <main v-if="view==='landing'" style="position:relative;z-index:1;">
       <!-- HERO -->
       <section style="position:relative;overflow:hidden;">
-        <div style="position:absolute;inset:0;background:radial-gradient(120% 90% at 82% 8%,oklch(72% 0.130 32 / .16),transparent 55%),radial-gradient(90% 70% at 10% 100%,oklch(58% 0.110 230 / .10),transparent 60%);pointer-events:none;"></div>
-        <div class="pa-hero-grid" style="position:relative;max-width:var(--container);margin:0 auto;padding:76px 32px 60px;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;">
+        <span class="pa-blob" style="top:-140px;right:-120px;width:560px;height:560px;background:radial-gradient(circle,rgba(217,119,87,.22),transparent 62%);"></span>
+        <span class="pa-blob" style="top:120px;left:-180px;width:520px;height:520px;background:radial-gradient(circle,rgba(79,134,224,.14),transparent 64%);"></span>
+        <span class="pa-blob" style="bottom:-160px;right:18%;width:420px;height:420px;background:radial-gradient(circle,rgba(31,158,150,.12),transparent 64%);"></span>
+        <div class="pa-hero-grid" style="position:relative;z-index:1;max-width:var(--container);margin:0 auto;padding:76px 32px 60px;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;">
           <div>
-            <div style="display:inline-flex;align-items:center;gap:9px;padding:7px 14px;border:1px solid var(--border-default);border-radius:999px;background:var(--surface-elevated);font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;color:var(--text-secondary);animation:pa-rise .6s var(--ease-out) both;">
-              <span style="width:7px;height:7px;border-radius:999px;background:var(--success);"></span>GRATUIT · OPEN-SOURCE · OPÉRÉ PAR E²SN
+            <div style="display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border:1px solid var(--glass-border);border-radius:999px;background:var(--glass-bg-strong);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-family:var(--font-sans);font-weight:600;font-size:12px;letter-spacing:.14em;color:var(--coral-700);animation:pa-rise .6s var(--ease-out) both;">
+              <span style="width:7px;height:7px;border-radius:999px;background:var(--success);"></span>GRATUIT · OPEN SOURCE · PAR E²SN
             </div>
-            <h1 style="font-family:var(--font-display);font-weight:400;font-size:clamp(46px,5.6vw,82px);line-height:1.02;letter-spacing:-.02em;margin:22px 0 0;color:var(--text-primary);text-wrap:balance;animation:pa-rise .7s .05s var(--ease-out) both;">Changez d'IA,<br>gardez votre <span style="font-style:italic;color:var(--coral-600);">mémoire</span>.</h1>
-            <p style="font-size:19px;line-height:1.6;color:var(--text-secondary);max-width:34ch;margin:24px 0 0;animation:pa-rise .7s .12s var(--ease-out) both;">PortabIA, c'est le <strong style="color:var(--text-primary);font-weight:600;">RIO de l'IA</strong> : migrez votre historique et votre contexte de travail d'une intelligence artificielle vers une autre, sans rien perdre.</p>
+            <h1 style="font-family:var(--font-display);font-weight:700;font-size:clamp(44px,5.4vw,80px);line-height:1.02;letter-spacing:-.02em;margin:22px 0 0;color:var(--text-primary);text-wrap:balance;animation:pa-rise .7s .05s var(--ease-out) both;">Changez d'IA,<br>gardez votre <span style="font-family:var(--font-serif);font-weight:400;font-style:italic;color:var(--coral-600);">mémoire</span>.</h1>
+            <p style="font-size:20px;line-height:1.55;color:var(--text-secondary);max-width:36ch;margin:24px 0 0;animation:pa-rise .7s .12s var(--ease-out) both;">Le <strong style="color:var(--text-primary);font-weight:600;">RIO de l'IA</strong> : migrez votre historique et votre contexte de travail d'un assistant à l'autre, sans rien perdre.</p>
             <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:32px;animation:pa-rise .7s .18s var(--ease-out) both;">
-              <button @click="goWizard" style="font-family:var(--font-sans);font-weight:600;font-size:16px;color:#fff;background:var(--coral-500);border:none;border-radius:14px;padding:16px 26px;cursor:pointer;box-shadow:var(--shadow-glow-coral);min-height:52px;">Migrer mon historique →</button>
-              <a href="#how" style="font-family:var(--font-sans);font-weight:600;font-size:16px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:14px;padding:16px 24px;cursor:pointer;text-decoration:none;min-height:52px;display:inline-flex;align-items:center;">Voir comment ça marche</a>
+              <button @click="goWizard" style="font-family:var(--font-sans);font-weight:600;font-size:16px;color:#fff;background:linear-gradient(145deg,#E59A6E,#D97757);border:none;border-radius:16px;padding:17px 28px;cursor:pointer;box-shadow:var(--shadow-glow-coral);min-height:54px;">Migrer mon historique →</button>
+              <a href="#how" style="font-family:var(--font-sans);font-weight:600;font-size:16px;color:var(--text-primary);background:var(--glass-bg-strong);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border-default);border-radius:16px;padding:17px 26px;cursor:pointer;text-decoration:none;min-height:54px;display:inline-flex;align-items:center;">Voir comment ça marche</a>
             </div>
-            <div style="display:inline-flex;align-items:center;gap:10px;margin-top:30px;padding:11px 16px;border-radius:12px;background:color-mix(in oklab,var(--success) 12%,var(--surface-elevated));border:1px solid color-mix(in oklab,var(--success) 30%,transparent);animation:pa-rise .7s .24s var(--ease-out) both;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M12 2l8 4v5c0 5-3.4 8.6-8 11-4.6-2.4-8-6-8-11V6l8-4z" stroke="var(--success)" stroke-width="1.8" fill="color-mix(in oklab,var(--success) 18%,transparent)"/><path d="M8.5 12l2.4 2.4 4.6-5" stroke="var(--success)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div style="display:inline-flex;align-items:center;gap:10px;margin-top:30px;padding:12px 18px;border-radius:14px;background:color-mix(in srgb,var(--teal) 12%,var(--surface-elevated));border:1px solid color-mix(in srgb,var(--teal) 30%,transparent);animation:pa-rise .7s .24s var(--ease-out) both;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;"><path d="M12 2l8 4v5c0 5-3.4 8.6-8 11-4.6-2.4-8-6-8-11V6l8-4z" stroke="var(--teal)" stroke-width="1.8" fill="color-mix(in srgb,var(--teal) 18%,transparent)"/><path d="M8.5 12l2.4 2.4 4.6-5" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <span style="font-size:13.5px;font-weight:500;color:var(--text-primary);">100 % dans votre navigateur · vos données ne sortent jamais de votre appareil</span>
             </div>
           </div>
-          <!-- PONTS MOTIF -->
+          <!-- PONTS MOTIF (spectre multi-IA) -->
           <div :data-anim="animFlag" style="position:relative;display:flex;justify-content:center;animation:pa-rise .8s .2s var(--ease-out) both;">
             <svg viewBox="0 0 460 440" width="100%" style="max-width:540px;overflow:visible;">
-              <defs><linearGradient id="paGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--coral-400)"/><stop offset="1" stop-color="var(--coral-600)"/></linearGradient></defs>
-              <g stroke="var(--border-strong)" stroke-width="2" fill="none" opacity="0.55">
+              <defs><linearGradient id="paGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4F86E0"/><stop offset=".3" stop-color="#1F9E96"/><stop offset=".6" stop-color="#D97757"/><stop offset="1" stop-color="#F2A93B"/></linearGradient></defs>
+              <g stroke="var(--border-strong)" stroke-width="2" fill="none" opacity="0.4">
                 <path d="M230 205 Q250 110 230 45"/><path d="M230 205 Q330 150 387 159"/><path d="M230 205 Q300 290 327 343"/><path d="M230 205 Q160 290 133 343"/><path d="M230 205 Q120 150 73 159"/>
               </g>
-              <g class="pa-bridge" stroke="url(#paGrad)" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-dasharray="7 13" style="animation:pa-flow 2.6s linear infinite;">
+              <g class="pa-bridge" stroke="url(#paGrad)" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-dasharray="7 13" style="animation:pa-flow 2.6s linear infinite;">
                 <path d="M230 205 Q250 110 230 45"/><path d="M230 205 Q330 150 387 159"/><path d="M230 205 Q300 290 327 343"/><path d="M230 205 Q160 290 133 343"/><path d="M230 205 Q120 150 73 159"/>
               </g>
               <g v-for="n in nodes" :key="n.id" class="pa-node" :style="n.anim">
                 <circle :cx="n.x" :cy="n.y" r="38" fill="var(--surface-elevated)" stroke="var(--border-default)" stroke-width="1.5"/>
+                <circle :cx="n.x" :cy="n.y" r="38" :fill="n.color" opacity="0.10"/>
                 <circle :cx="n.x" :cy="n.y - 8" r="13" :fill="n.color"/>
-                <text :x="n.x" :y="n.y + 12" text-anchor="middle" font-family="Geist,sans-serif" font-size="12" font-weight="700" :fill="n.color">{{ n.mark }}</text>
-                <text :x="n.x" :y="n.y + 38 + 18" text-anchor="middle" font-family="Geist,sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)">{{ n.name }}</text>
+                <circle :cx="n.x" :cy="n.y - 8" r="13" fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="1.4"/>
+                <text :x="n.x" :y="n.y + 38 + 18" text-anchor="middle" font-family="Sora,sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)">{{ n.name }}</text>
               </g>
               <g class="pa-hub" style="transform-origin:230px 205px;animation:pa-pulse 3.4s var(--ease-in-out) infinite;">
-                <rect x="194" y="169" width="72" height="72" rx="20" fill="var(--navy-900)"/>
-                <text x="212" y="222" font-family="Instrument Serif" font-size="38" fill="var(--stone-50)">E</text>
-                <text x="234" y="200" font-family="Instrument Serif" font-style="italic" font-size="19" fill="var(--coral-500)">2</text>
-                <text x="234" y="220" font-family="Geist,sans-serif" font-size="12" font-weight="600" fill="var(--stone-300)">SN</text>
+                <rect x="194" y="169" width="72" height="72" rx="20" fill="url(#paHub)"/>
+                <defs><linearGradient id="paHub" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E08763"/><stop offset="1" stop-color="#C9603F"/></linearGradient></defs>
+                <text x="230" y="209" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="26" fill="#FCFAF7">E²</text>
+                <text x="230" y="228" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="13" letter-spacing="0.08em" fill="#FCFAF7">SN</text>
               </g>
             </svg>
           </div>
@@ -368,22 +369,29 @@ function downloadKit() {
       </section>
 
       <!-- COMPAT -->
-      <section id="compat" style="max-width:var(--container);margin:0 auto;padding:36px 32px 8px;">
-        <p style="font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--text-muted);text-align:center;text-transform:uppercase;margin:0 0 22px;">Compatible avec vos IA · dans les deux sens</p>
-        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px;">
-          <div v-for="a in ais" :key="a.id" style="display:flex;align-items:center;gap:11px;padding:12px 20px 12px 12px;border:1px solid var(--border-default);border-radius:999px;background:var(--surface-elevated);box-shadow:var(--shadow-sm);">
-            <span :style="'width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:#fff;'+a.markStyle">{{ a.mark }}</span>
-            <span style="font-size:15px;font-weight:500;color:var(--text-primary);">{{ a.name }}</span>
+      <section id="compat" style="max-width:var(--container);margin:0 auto;padding:48px 32px 8px;">
+        <div style="text-align:center;margin-bottom:30px;">
+          <p style="font-family:var(--font-sans);font-weight:600;font-size:13px;letter-spacing:.2em;color:var(--coral-700);text-transform:uppercase;margin:0 0 12px;">Compatible</p>
+          <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(28px,3.4vw,42px);line-height:1.06;letter-spacing:-.02em;margin:0;color:var(--text-primary);">5 IA majeures. <span style="font-family:var(--font-serif);font-weight:400;font-style:italic;color:var(--coral-600);">Dans les deux sens.</span></h2>
+        </div>
+        <div class="pa-aigrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:18px;">
+          <div v-for="a in ais" :key="a.id" class="pa-aicard pa-glass" style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:30px 12px;border-radius:24px;">
+            <span :style="'width:60px;height:60px;border-radius:50%;background:'+a.grad+';box-shadow:0 8px 20px '+a.color+'66;'"></span>
+            <span style="font-family:var(--font-sans);font-weight:600;font-size:19px;color:var(--text-primary);">{{ a.name }}</span>
           </div>
         </div>
-        <p style="font-size:12.5px;color:var(--text-muted);text-align:center;max-width:60ch;margin:20px auto 0;line-height:1.5;">PortabIA n'est affilié à aucun de ces services. Les noms et marques cités appartiennent à leurs détenteurs respectifs.</p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:30px;">
+          <svg width="34" height="22" viewBox="0 0 34 22" fill="none"><path d="M10 3 L3 8 l7 5" stroke="var(--coral-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 8 H31" stroke="var(--coral-600)" stroke-width="2" stroke-linecap="round"/><path d="M24 19 l7 -5 -7 -5" stroke="var(--coral-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M31 14 H3" stroke="var(--coral-600)" stroke-width="2" stroke-linecap="round"/></svg>
+          <span style="font-family:var(--font-sans);font-weight:600;font-size:17px;color:var(--text-secondary);">Import <span style="color:var(--coral-600);">&amp;</span> export — sans perte</span>
+        </div>
+        <p style="font-size:12.5px;color:var(--text-muted);text-align:center;max-width:60ch;margin:24px auto 0;line-height:1.5;">PortabIA n'est affilié à aucun de ces services. Les noms et marques cités appartiennent à leurs détenteurs respectifs.</p>
       </section>
 
       <!-- DÉMO VIDÉO -->
       <section id="demo" style="max-width:1000px;margin:0 auto;padding:56px 32px 8px;">
         <div style="text-align:center;margin-bottom:26px;">
-          <p style="font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--text-muted);text-transform:uppercase;margin:0 0 10px;">Démo · 1 min</p>
-          <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,4vw,46px);letter-spacing:-.02em;margin:0;color:var(--text-primary);">PortabIA en action.</h2>
+          <p style="font-family:var(--font-sans);font-weight:600;font-size:13px;letter-spacing:.2em;color:var(--coral-700);text-transform:uppercase;margin:0 0 10px;">Démo · 1 min</p>
+          <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4vw,46px);letter-spacing:-.02em;margin:0;color:var(--text-primary);">PortabIA en action.</h2>
           <p style="font-size:16.5px;color:var(--text-secondary);max-width:48ch;margin:14px auto 0;line-height:1.6;">À quoi ça sert, pourquoi c'est libre et gratuit, et comment porter votre contexte d'une IA à l'autre — en une minute.</p>
         </div>
         <div style="position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--border-subtle);box-shadow:var(--shadow-lg);background:#0d1b2a;aspect-ratio:16/9;">
@@ -397,14 +405,13 @@ function downloadKit() {
       <!-- COMMENT CA MARCHE -->
       <section id="how" style="max-width:var(--container);margin:0 auto;padding:84px 32px;">
         <div style="max-width:640px;">
-          <p style="font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--coral-600);text-transform:uppercase;margin:0;">01 · La portabilité</p>
-          <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(34px,4vw,50px);line-height:1.06;letter-spacing:-.02em;margin:14px 0 0;">Trois gestes, <span style="font-style:italic;color:var(--coral-600);">votre contexte vous suit</span>.</h2>
+          <p style="font-family:var(--font-sans);font-weight:600;font-size:13px;letter-spacing:.2em;color:var(--coral-700);text-transform:uppercase;margin:0;">Comment ça marche</p>
+          <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(34px,4vw,50px);line-height:1.06;letter-spacing:-.02em;margin:14px 0 0;">Trois gestes, <span style="font-family:var(--font-serif);font-weight:400;font-style:italic;color:var(--coral-600);">votre contexte vous suit</span>.</h2>
         </div>
         <div class="pa-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:46px;">
-          <div v-for="st in steps" :key="st.num" style="padding:30px;border:1px solid var(--border-subtle);border-radius:20px;background:var(--surface-elevated);box-shadow:var(--shadow-sm);">
-            <div style="font-family:var(--font-mono);font-size:13px;color:var(--coral-600);">{{ st.num }}</div>
-            <div style="font-size:30px;margin:14px 0 12px;">{{ st.icon }}</div>
-            <h3 style="font-family:var(--font-display);font-weight:400;font-size:25px;line-height:1.1;margin:0 0 10px;color:var(--text-primary);">{{ st.title }}</h3>
+          <div v-for="st in steps" :key="st.num" class="pa-glass" style="padding:32px 30px;border-radius:24px;">
+            <div style="font-family:var(--font-serif);font-style:italic;font-size:62px;line-height:.8;color:var(--coral-500);">{{ st.num }}</div>
+            <h3 style="font-family:var(--font-display);font-weight:700;font-size:24px;line-height:1.12;margin:20px 0 10px;color:var(--text-primary);">{{ st.title }}</h3>
             <p style="font-size:15px;line-height:1.6;color:var(--text-secondary);margin:0;">{{ st.body }}</p>
           </div>
         </div>
@@ -413,15 +420,15 @@ function downloadKit() {
       <!-- IA -> IA CARDS -->
       <section style="max-width:var(--container);margin:0 auto;padding:0 32px 84px;">
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px;">
-          <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,3.4vw,42px);margin:0;letter-spacing:-.02em;">Des ponts dans les deux sens</h2>
+          <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(30px,3.4vw,42px);margin:0;letter-spacing:-.02em;">Des ponts dans les deux sens</h2>
           <button @click="goWizard" style="font-family:var(--font-sans);font-weight:600;font-size:14.5px;color:var(--coral-700);background:none;border:none;cursor:pointer;">Construire mon pont →</button>
         </div>
         <div class="pa-grid-3" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
-          <button v-for="b in bridges" :key="b.title" @click="startBridge(b)" class="pa-bridgecard" style="text-align:left;padding:24px;border:1px solid var(--border-subtle);border-radius:18px;background:var(--surface-elevated);box-shadow:var(--shadow-sm);cursor:pointer;">
+          <button v-for="b in bridges" :key="b.title" @click="startBridge(b)" class="pa-bridgecard pa-glass" style="text-align:left;padding:26px;border-radius:22px;cursor:pointer;">
             <div style="display:flex;align-items:center;gap:12px;">
-              <span :style="'width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#fff;'+b.fromStyle">{{ b.fromMark }}</span>
+              <span :style="'width:40px;height:40px;border-radius:50%;flex:none;box-shadow:var(--shadow-sm);'+b.fromStyle"></span>
               <svg width="26" height="14" viewBox="0 0 26 14" fill="none"><path d="M1 7h22M18 2l5 5-5 5" stroke="var(--coral-500)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span :style="'width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#fff;'+b.toStyle">{{ b.toMark }}</span>
+              <span :style="'width:40px;height:40px;border-radius:50%;flex:none;box-shadow:var(--shadow-sm);'+b.toStyle"></span>
             </div>
             <h3 style="font-family:var(--font-sans);font-weight:600;font-size:16px;margin:18px 0 6px;color:var(--text-primary);">{{ b.title }}</h3>
             <p style="font-size:13.5px;line-height:1.55;color:var(--text-secondary);margin:0;">{{ b.body }}</p>
@@ -430,17 +437,19 @@ function downloadKit() {
       </section>
 
       <!-- PRIVACY -->
-      <section id="privacy" style="background:var(--navy-900);color:var(--text-inverse);">
-        <div class="pa-grid-2" style="max-width:var(--container);margin:0 auto;padding:74px 32px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
+      <section id="privacy" style="position:relative;overflow:hidden;background:radial-gradient(130% 110% at 18% 8%,#0A2036 0%,#001024 60%,#000B18 100%);color:var(--text-inverse);">
+        <span class="pa-blob" style="bottom:-150px;left:-120px;width:520px;height:520px;background:radial-gradient(circle,rgba(31,158,150,.16),transparent 64%);"></span>
+        <span class="pa-blob" style="top:-120px;right:-100px;width:480px;height:480px;background:radial-gradient(circle,rgba(217,119,87,.18),transparent 64%);"></span>
+        <div class="pa-grid-2" style="position:relative;z-index:1;max-width:var(--container);margin:0 auto;padding:80px 32px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
           <div>
-            <p style="font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;color:var(--coral-400);text-transform:uppercase;margin:0;">Souveraineté</p>
-            <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(32px,3.6vw,46px);line-height:1.05;letter-spacing:-.02em;margin:14px 0 16px;color:#fff;">Vos données ne quittent <span style="font-style:italic;color:var(--coral-400);">jamais</span> votre appareil.</h2>
-            <p style="font-size:16px;line-height:1.65;color:oklch(82% 0.02 60);margin:0;max-width:46ch;">Toute la conversion se fait localement, dans votre navigateur. Aucun historique n'est téléversé. Open-source, auditable, sous licence Apache-2.0.</p>
+            <p style="font-family:var(--font-sans);font-weight:600;font-size:13px;letter-spacing:.2em;color:var(--coral-400);text-transform:uppercase;margin:0;">Privé par conception</p>
+            <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(32px,3.6vw,46px);line-height:1.05;letter-spacing:-.02em;margin:14px 0 16px;color:#fff;">Vos données ne quittent <span style="font-family:var(--font-serif);font-weight:400;font-style:italic;color:var(--coral-400);">jamais</span> votre appareil.</h2>
+            <p style="font-size:16px;line-height:1.65;color:#AEB6C2;margin:0;max-width:46ch;">Toute la conversion se fait localement, dans votre navigateur. Aucun historique n'est téléversé. Open-source, auditable, sous licence Apache-2.0.</p>
           </div>
           <div style="display:grid;gap:14px;">
-            <div v-for="g in guarantees" :key="g.title" style="display:flex;gap:14px;align-items:flex-start;padding:18px 20px;border:1px solid oklch(34% 0.075 248);border-radius:14px;background:oklch(22% 0.070 248);">
-              <span style="color:var(--coral-400);font-size:18px;line-height:1.4;">{{ g.icon }}</span>
-              <div><div style="font-weight:600;font-size:15px;color:#fff;">{{ g.title }}</div><div style="font-size:13.5px;color:oklch(78% 0.02 60);margin-top:3px;line-height:1.5;">{{ g.body }}</div></div>
+            <div v-for="g in guarantees" :key="g.title" style="display:flex;gap:16px;align-items:center;padding:20px 22px;border:1px solid rgba(255,255,255,.10);border-radius:18px;background:rgba(255,255,255,.05);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">
+              <span :style="'width:13px;height:13px;border-radius:50%;flex:none;background:'+g.color+';box-shadow:0 0 0 5px '+g.color+'29;'"></span>
+              <div><div style="font-weight:600;font-size:16px;color:#fff;">{{ g.title }}</div><div style="font-size:13.5px;color:#9BA3B0;margin-top:3px;line-height:1.5;">{{ g.body }}</div></div>
             </div>
           </div>
         </div>
@@ -448,7 +457,7 @@ function downloadKit() {
 
       <!-- FAQ -->
       <section id="faq" style="max-width:760px;margin:0 auto;padding:84px 32px;">
-        <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(32px,3.6vw,46px);text-align:center;letter-spacing:-.02em;margin:0 0 36px;">Questions fréquentes</h2>
+        <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(32px,3.6vw,46px);text-align:center;letter-spacing:-.02em;margin:0 0 36px;">Questions fréquentes</h2>
         <div style="display:flex;flex-direction:column;gap:12px;">
           <div v-for="(f,i) in faqs" :key="i" style="border:1px solid var(--border-subtle);border-radius:16px;background:var(--surface-elevated);overflow:hidden;">
             <button @click="toggleFaq(i)" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px;background:none;border:none;cursor:pointer;text-align:left;font-family:var(--font-sans);font-weight:600;font-size:16px;color:var(--text-primary);">
@@ -462,7 +471,7 @@ function downloadKit() {
       <!-- AVIS + ANNUAIRES -->
       <section id="avis" style="max-width:var(--container);margin:0 auto;padding:0 32px 84px;">
         <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:8px;">
-          <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,3.4vw,42px);margin:0;letter-spacing:-.02em;">Ils ont repris la main</h2>
+          <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(30px,3.4vw,42px);margin:0;letter-spacing:-.02em;">Ils ont repris la main</h2>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <span v-for="d in ['Trustpilot','G2','Capterra']" :key="d" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--text-secondary);border:1px solid var(--border-default);border-radius:999px;padding:6px 13px;background:var(--surface-elevated);">★ {{ d }}</span>
           </div>
@@ -491,26 +500,54 @@ function downloadKit() {
         </details>
       </section>
 
-      <!-- CROSS-PROMO E²SNauthor -->
-      <section style="max-width:var(--container);margin:0 auto;padding:0 32px 84px;">
-        <div class="pa-grid-2" style="display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;border:1px solid var(--border-subtle);border-radius:20px;background:var(--surface-sunken);padding:28px 32px;">
-          <div>
-            <div style="font-family:var(--font-mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral-600);">Du même éditeur · E²SN</div>
-            <h3 style="font-family:var(--font-display);font-weight:400;font-size:26px;margin:8px 0 4px;letter-spacing:-.01em;">Vous créez des formations ?</h3>
-            <p style="font-size:14.5px;color:var(--text-secondary);margin:0;max-width:54ch;">Découvrez <strong style="color:var(--text-primary);">E²SNauthor</strong>, la plateforme souveraine pour concevoir, diffuser et piloter vos formations.</p>
-          </div>
-          <a href="https://essnauthor.fr" target="_blank" rel="noopener" style="font-family:var(--font-sans);font-weight:600;font-size:15px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:12px;padding:13px 22px;text-decoration:none;white-space:nowrap;">Découvrir E²SNauthor ↗</a>
+      <!-- ÉCOSYSTÈME E²SN (2 blocs jumeaux : E²SNauthor + ESSN) -->
+      <section id="ecosysteme" style="max-width:var(--container);margin:0 auto;padding:0 32px 84px;">
+        <div style="text-align:center;max-width:600px;margin:0 auto 36px;">
+          <p style="font-family:var(--font-sans);font-weight:600;font-size:13px;letter-spacing:.2em;color:var(--coral-700);text-transform:uppercase;margin:0 0 12px;">L'écosystème E²SN</p>
+          <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(30px,3.4vw,44px);line-height:1.06;letter-spacing:-.02em;margin:0;">PortabIA est un service <span style="font-family:var(--font-serif);font-weight:400;font-style:italic;color:var(--coral-600);">E²SN</span>.</h2>
+          <p style="font-size:16px;color:var(--text-secondary);line-height:1.6;margin:14px auto 0;max-width:50ch;">La même mission partout : votre souveraineté et votre maîtrise face aux outils numériques. Découvrez le reste de l'écosystème.</p>
+        </div>
+        <div class="pa-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+
+          <!-- Carte E²SNauthor -->
+          <a href="https://essnauthor.fr" target="_blank" rel="noopener" class="pa-ecocard" style="display:flex;flex-direction:column;text-decoration:none;border:1px solid var(--border-subtle);border-left:3px solid var(--coral-500);border-radius:20px;background:var(--surface-elevated);box-shadow:var(--shadow-sm);padding:30px 32px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+              <svg width="40" height="40" viewBox="0 0 80 80" fill="none" aria-hidden="true" style="flex:none;"><rect x="2" y="2" width="76" height="76" rx="18" fill="var(--navy-900)"/><text x="20" y="55" font-family="Instrument Serif" font-size="44" fill="var(--stone-50)" letter-spacing="-0.04em">E</text><text x="46" y="36" font-family="Instrument Serif" font-style="italic" font-size="22" fill="var(--coral-500)">2</text><text x="46" y="55" font-family="Geist, sans-serif" font-size="14" font-weight="600" fill="var(--stone-300)" letter-spacing="0.05em">SN</text></svg>
+              <span style="font-family:var(--font-display);font-size:24px;letter-spacing:-.01em;color:var(--text-primary);">E²SNauthor</span>
+            </div>
+            <div style="font-family:var(--font-sans);font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral-700);margin-bottom:8px;">La plateforme de formation</div>
+            <h3 style="font-family:var(--font-display);font-weight:700;font-size:23px;line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;color:var(--text-primary);">Vous créez des formations ?</h3>
+            <p style="font-size:14.5px;line-height:1.6;color:var(--text-secondary);margin:0 0 20px;">Concevez, diffusez et pilotez vos formations sur la plateforme souveraine d'authoring et de LMS, propulsée par l'IA.</p>
+            <span style="margin-top:auto;font-family:var(--font-sans);font-weight:600;font-size:14.5px;color:var(--coral-700);display:inline-flex;align-items:center;gap:7px;">Découvrir E²SNauthor <span aria-hidden="true">↗</span></span>
+          </a>
+
+          <!-- Carte ESSN -->
+          <a href="https://essn.fr/" target="_blank" rel="noopener" class="pa-ecocard" style="display:flex;flex-direction:column;text-decoration:none;border:1px solid var(--border-subtle);border-left:3px solid var(--navy-700);border-radius:20px;background:var(--surface-elevated);box-shadow:var(--shadow-sm);padding:30px 32px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+              <svg width="40" height="40" viewBox="0 0 80 80" fill="none" aria-hidden="true" style="flex:none;"><rect x="2" y="2" width="76" height="76" rx="18" fill="var(--navy-900)"/><text x="22" y="52" font-family="Geist, sans-serif" font-size="34" font-weight="600" fill="var(--stone-50)" letter-spacing="0.02em">SN</text><circle cx="60" cy="22" r="7" fill="var(--coral-500)"/></svg>
+              <span style="font-family:var(--font-display);font-size:24px;letter-spacing:-.01em;color:var(--text-primary);">ESSN</span>
+            </div>
+            <div style="font-family:var(--font-sans);font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral-700);margin-bottom:8px;">École · Conseil · Édition</div>
+            <h3 style="font-family:var(--font-display);font-weight:700;font-size:23px;line-height:1.15;letter-spacing:-.01em;margin:0 0 10px;color:var(--text-primary);">À l'origine de PortabIA.</h3>
+            <p style="font-size:14.5px;line-height:1.6;color:var(--text-secondary);margin:0 0 20px;">L'organisme qui forme, conseille et édite autour de la souveraineté numérique et de l'interopérabilité. PortabIA en est l'un des services gratuits.</p>
+            <span style="margin-top:auto;font-family:var(--font-sans);font-weight:600;font-size:14.5px;color:var(--coral-700);display:inline-flex;align-items:center;gap:7px;">Visiter essn.fr <span aria-hidden="true">↗</span></span>
+          </a>
+
         </div>
       </section>
 
       <!-- FINAL CTA -->
       <section style="max-width:var(--container);margin:0 auto;padding:0 32px 90px;">
-        <div style="position:relative;overflow:hidden;border-radius:28px;background:var(--coral-500);padding:64px 48px;text-align:center;box-shadow:var(--shadow-lg);">
-          <div style="position:absolute;inset:0;background:radial-gradient(80% 120% at 50% -20%,oklch(80% 0.1 36 / .5),transparent 60%);"></div>
-          <div style="position:relative;">
-            <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(36px,4.4vw,58px);line-height:1.03;letter-spacing:-.02em;margin:0;color:var(--navy-950);">Votre contexte vous appartient.</h2>
-            <p style="font-size:18px;color:oklch(25% 0.06 26);margin:16px auto 30px;max-width:42ch;">Gratuit, sans compte, sans limite. Construisez votre premier pont en moins d'une minute.</p>
-            <button @click="goWizard" style="font-family:var(--font-sans);font-weight:600;font-size:17px;color:#fff;background:var(--navy-900);border:none;border-radius:14px;padding:17px 32px;cursor:pointer;min-height:54px;box-shadow:var(--shadow-md);">Migrer mon historique →</button>
+        <div style="position:relative;overflow:hidden;border-radius:34px;background:radial-gradient(130% 110% at 80% 0%,#0A2036 0%,#001024 60%,#000B18 100%);padding:72px 48px;text-align:center;box-shadow:var(--shadow-lg);">
+          <span class="pa-blob" style="top:-120px;right:-100px;width:560px;height:560px;background:radial-gradient(circle,rgba(217,119,87,.34),transparent 62%);"></span>
+          <span class="pa-blob" style="bottom:-160px;left:-120px;width:520px;height:520px;background:radial-gradient(circle,rgba(79,134,224,.22),transparent 64%);"></span>
+          <div style="position:relative;z-index:1;">
+            <div style="display:flex;justify-content:center;gap:11px;margin-bottom:24px;">
+              <span v-for="a in ais" :key="a.id" :style="'width:15px;height:15px;border-radius:50%;background:'+a.grad"></span>
+            </div>
+            <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(38px,4.6vw,64px);line-height:1.0;letter-spacing:-.02em;margin:0;color:#F4EFE9;">Essayez. <span style="font-family:var(--font-serif);font-weight:400;font-style:italic;color:#F7A791;">Gratuitement.</span></h2>
+            <p style="font-size:18px;line-height:1.45;color:#AEB6C2;margin:18px auto 32px;max-width:44ch;">Sans inscription, sans limite. Votre contexte vous suit, d'une IA à l'autre — en moins d'une minute.</p>
+            <button @click="goWizard" style="font-family:var(--font-sans);font-weight:600;font-size:17px;color:#001024;background:linear-gradient(145deg,#E59A6E,#D97757);border:none;border-radius:16px;padding:18px 34px;cursor:pointer;min-height:56px;box-shadow:var(--shadow-glow-coral);">Migrer mon historique →</button>
           </div>
         </div>
       </section>
@@ -521,7 +558,7 @@ function downloadKit() {
           <div>
             <div style="display:flex;align-items:center;gap:10px;">
               <svg width="34" height="34" viewBox="0 0 80 80" fill="none" aria-label="E2SN" style="flex:none;"><rect x="2" y="2" width="76" height="76" rx="18" fill="var(--navy-900)"/><text x="20" y="55" font-family="Instrument Serif" font-size="44" fill="var(--stone-50)" letter-spacing="-0.04em">E</text><text x="46" y="36" font-family="Instrument Serif" font-style="italic" font-size="22" fill="var(--coral-500)">2</text><text x="46" y="55" font-family="Geist, sans-serif" font-size="14" font-weight="600" fill="var(--stone-300)" letter-spacing="0.05em">SN</text></svg>
-              <span style="font-family:var(--font-display);font-size:22px;">Portab<span style="font-style:italic;color:var(--coral-500);">IA</span></span>
+              <span style="font-family:var(--font-serif);font-size:24px;">Portab<span style="font-style:italic;color:var(--coral-500);">IA</span></span>
             </div>
             <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin:16px 0 0;max-width:34ch;">Le RIO de l'IA. Un service gratuit et open-source opéré par E²SN — Guillaume BOUTON.</p>
             <div style="display:flex;gap:10px;margin-top:18px;">
@@ -554,7 +591,7 @@ function downloadKit() {
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;">
         <button v-for="(d,k) in { cgu:'CGU', mentions:'Mentions légales', confidentialite:'Confidentialité', transmission:'Transmission aux IA' }" :key="k" @click="openLegal(k)" :style="'font-family:var(--font-sans);font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;cursor:pointer;border:1px solid var(--border-default);'+(legalId===k?'background:var(--coral-500);color:#fff;border-color:var(--coral-500);':'background:var(--surface-elevated);color:var(--text-secondary);')">{{ d }}</button>
       </div>
-      <h1 style="font-family:var(--font-display);font-weight:400;font-size:clamp(32px,4vw,46px);letter-spacing:-.02em;margin:0 0 28px;">{{ legalDoc.title }}</h1>
+      <h1 style="font-family:var(--font-display);font-weight:700;font-size:clamp(32px,4vw,46px);letter-spacing:-.02em;margin:0 0 28px;">{{ legalDoc.title }}</h1>
       <div style="display:flex;flex-direction:column;gap:22px;">
         <div v-for="(b,i) in legalDoc.blocks" :key="i">
           <h2 style="font-family:var(--font-sans);font-weight:600;font-size:17px;margin:0 0 6px;color:var(--text-primary);">{{ b[0] }}</h2>
@@ -578,7 +615,7 @@ function downloadKit() {
 
       <!-- step 0 -->
       <template v-if="step===0">
-        <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">D'où partez-vous ?</h2>
+        <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">D'où partez-vous ?</h2>
         <p style="font-size:16px;color:var(--text-secondary);margin:0 0 28px;">Choisissez l'IA qui détient votre historique actuel.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;">
           <button v-for="a in sourceList" :key="a.id" @click="pickSource(a.id)" :style="'display:flex;align-items:center;gap:12px;padding:18px;border-radius:16px;cursor:pointer;border:2px solid;'+a.cardStyle">
@@ -590,7 +627,7 @@ function downloadKit() {
 
       <!-- step 1 -->
       <template v-else-if="step===1">
-        <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">Vers quelle IA ?</h2>
+        <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">Vers quelle IA ?</h2>
         <p style="font-size:16px;color:var(--text-secondary);margin:0 0 28px;">Destination du pont depuis <strong style="color:var(--text-primary);">{{ src.name }}</strong>.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;">
           <button v-for="a in targetList" :key="a.id" @click="pickTarget(a.id)" :style="'display:flex;align-items:center;gap:12px;padding:18px;border-radius:16px;cursor:pointer;border:2px solid;'+a.cardStyle">
@@ -602,7 +639,7 @@ function downloadKit() {
 
       <!-- step 2 -->
       <template v-else-if="step===2">
-        <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">Que voulez-vous emporter ?</h2>
+        <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">Que voulez-vous emporter ?</h2>
         <p style="font-size:16px;color:var(--text-secondary);margin:0 0 28px;">Cochez ce qui doit traverser le pont. Rien n'est envoyé sans vous.</p>
         <div style="display:flex;flex-direction:column;gap:12px;">
           <div v-for="it in itemList" :key="it.id" :style="'border-radius:14px;border:2px solid;'+it.rowStyle">
@@ -639,7 +676,7 @@ function downloadKit() {
           <div style="width:64px;height:64px;border-radius:999px;margin:0 auto 18px;background:color-mix(in oklab,var(--success) 16%,var(--surface-elevated));border:1px solid color-mix(in oklab,var(--success) 36%,transparent);display:flex;align-items:center;justify-content:center;">
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.2 4.2L19 7" stroke="var(--success)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">Votre pont est prêt.</h2>
+          <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">Votre pont est prêt.</h2>
           <p style="font-size:16px;color:var(--text-secondary);margin:0 auto 28px;max-width:44ch;">Le fichier de migration est généré localement, dans votre navigateur. Importez-le dans votre nouvelle IA.</p>
         </div>
         <!-- en-tête source -> cible -->
