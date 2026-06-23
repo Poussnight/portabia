@@ -27,18 +27,22 @@ export function buildExportPrompt(sourceAi, selection) {
   const scope = selection?.scope || 'total'
 
   const axisInstructions = chosen.map(([key, v]) => {
+    // granularité fine : chaque axe peut être TOTAL ou PARTIEL (sinon repli sur le scope global)
+    const axisScope = v.scope || scope
     const lvl = v.mode === 'summary' ? 'sous forme de RÉSUMÉ structuré (briefing/handoff)' :
       v.mode === 'decisions' ? 'en ne gardant QUE les décisions clés' :
-      scope === 'partial' ? 'de façon PARTIELLE (uniquement l\'essentiel récent et réutilisable)' :
+      axisScope === 'partial' ? 'de façon PARTIELLE (uniquement l\'essentiel récent et réutilisable)' :
       'de façon COMPLÈTE'
     return `- **${AXIS_LABELS[key] || key}** : extrais ce contenu ${lvl}.`
   }).join('\n')
+
+  const scopeLabel = scope === 'partial' ? 'PARTIEL' : scope === 'mixed' ? 'PERSONNALISÉ (par axe)' : 'TOTAL'
 
   return `Tu es mon assistant ${ai.label}. Je veux PORTER mon contexte de travail vers une autre IA.
 Produis UNIQUEMENT un objet JSON valide conforme au schéma « E²SN Portable AI Context Spec v1 » ci-dessous,
 sans aucun texte autour. N'invente rien : si une information est absente, omets le champ.
 
-Périmètre demandé (${scope === 'partial' ? 'PARTIEL' : 'TOTAL'}) :
+Périmètre demandé (${scopeLabel}) :
 ${axisInstructions || '- (aucun axe sélectionné)'}
 
 IMPORTANT (confidentialité) : remplace toute donnée sensible (e-mails, clés/API/tokens, mots de passe,

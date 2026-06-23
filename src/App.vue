@@ -39,6 +39,10 @@ const step = ref(0)
 const source = ref('chatgpt')
 const target = ref(null)
 const items = reactive({ conv: true, instr: true, mem: true, proj: false, persona: false })
+// granularité fine par item : 'total' (tout) ou 'partial' (l'essentiel)
+const gran = reactive({ conv: 'partial', instr: 'total', mem: 'total', proj: 'total', persona: 'total' })
+const granOptions = [{ id: 'total', label: 'Tout' }, { id: 'partial', label: "L'essentiel" }]
+function setGran(id, g) { gran[id] = g }
 const faqOpen = ref(0)
 const animOn = ref(true)
 
@@ -145,10 +149,16 @@ function pickSource(id) { source.value = id; if (target.value === id) target.val
 function pickTarget(id) { target.value = id }
 const itemList = computed(() => ITEMS.map((it) => {
   const on = !!items[it.id]
-  return { ...it, check: on ? '✓' : '',
+  return { ...it, on, granVal: gran[it.id] || 'total', check: on ? '✓' : '',
     rowStyle: on ? 'border-color:var(--coral-500);background:color-mix(in oklab,var(--coral-500) 7%,var(--surface-elevated));' : 'border-color:var(--border-default);background:var(--surface-elevated);',
     boxStyle: on ? 'background:var(--coral-500);' : 'background:transparent;border:2px solid var(--border-strong);' }
 }))
+function segStyle(it, gid) {
+  const active = it.granVal === gid
+  return 'font-family:var(--font-sans);font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:999px;cursor:pointer;' +
+    (active ? 'background:var(--coral-500);color:#fff;border:1px solid var(--coral-500);'
+            : 'background:transparent;color:var(--text-secondary);border:1px solid var(--border-default);')
+}
 function toggleItem(id) { items[id] = !items[id] }
 
 const stepNames = ['Source', 'Destination', 'À migrer', 'Pont prêt']
@@ -187,8 +197,18 @@ async function onFile(ev) {
 
 function buildSelection() {
   const axes = {}
-  for (const it of ITEMS) if (items[it.id]) axes[it.axis] = { on: true, mode: it.axis === 'conversation' ? 'summary' : undefined }
-  return { scope: 'total', axes }
+  for (const it of ITEMS) {
+    if (!items[it.id]) continue
+    const g = gran[it.id] || 'total'
+    // deux items peuvent viser le même axe (mem+proj, instr+persona) : 'total' (plus inclusif) l'emporte
+    const cur = axes[it.axis]
+    const scope = cur ? (cur.scope === 'total' || g === 'total' ? 'total' : 'partial') : g
+    axes[it.axis] = { on: true, scope, mode: it.axis === 'conversation' ? (scope === 'partial' ? 'summary' : 'full') : undefined }
+  }
+  const scopes = Object.values(axes).map((a) => a.scope)
+  const scope = scopes.length && scopes.every((s) => s === 'total') ? 'total'
+    : scopes.length && scopes.every((s) => s === 'partial') ? 'partial' : 'mixed'
+  return { scope, axes }
 }
 
 function next() {
@@ -555,10 +575,16 @@ function downloadKit() {
         <h2 style="font-family:var(--font-display);font-weight:400;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">Que voulez-vous emporter ?</h2>
         <p style="font-size:16px;color:var(--text-secondary);margin:0 0 28px;">Cochez ce qui doit traverser le pont. Rien n'est envoyé sans vous.</p>
         <div style="display:flex;flex-direction:column;gap:12px;">
-          <button v-for="it in itemList" :key="it.id" @click="toggleItem(it.id)" :style="'display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:14px;cursor:pointer;text-align:left;border:2px solid;'+it.rowStyle">
-            <span :style="'width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;'+it.boxStyle">{{ it.check }}</span>
-            <span><span style="display:block;font-size:16px;font-weight:600;color:var(--text-primary);">{{ it.title }}</span><span style="display:block;font-size:13.5px;color:var(--text-secondary);margin-top:2px;">{{ it.body }}</span></span>
-          </button>
+          <div v-for="it in itemList" :key="it.id" :style="'border-radius:14px;border:2px solid;'+it.rowStyle">
+            <button @click="toggleItem(it.id)" style="width:100%;display:flex;align-items:center;gap:16px;padding:18px 20px;background:none;border:none;cursor:pointer;text-align:left;">
+              <span :style="'width:26px;height:26px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;'+it.boxStyle">{{ it.check }}</span>
+              <span><span style="display:block;font-size:16px;font-weight:600;color:var(--text-primary);">{{ it.title }}</span><span style="display:block;font-size:13.5px;color:var(--text-secondary);margin-top:2px;">{{ it.body }}</span></span>
+            </button>
+            <div v-if="it.on" style="display:flex;align-items:center;gap:8px;padding:0 20px 16px 62px;">
+              <span style="font-size:12px;color:var(--text-muted);">Quantité :</span>
+              <button v-for="g in granOptions" :key="g.id" @click="setGran(it.id, g.id)" :style="segStyle(it, g.id)">{{ g.label }}</button>
+            </div>
+          </div>
         </div>
         <!-- Mode B : import direct d'un fichier d'export (optionnel) -->
         <div style="margin-top:18px;padding:18px 20px;border:1px dashed var(--border-strong);border-radius:14px;background:var(--surface-sunken);">

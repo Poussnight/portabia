@@ -33,6 +33,8 @@ export function renderNativeRules(bundle, targetAi) {
   md += section('Glossaire', (proj.glossary || []).map((g) => (typeof g === 'string' ? g : `${g.term} : ${g.def || ''}`)))
   md += section('Mémoire / préférences', (proj.memory || []).map((m) => (typeof m === 'string' ? m : JSON.stringify(m))))
   if (conv.summary) md += section('Résumé de la conversation précédente (briefing)', conv.summary)
+  if (conv.decisions?.length) md += section('Décisions (conversation)', conv.decisions.map((d) => (typeof d === 'string' ? d : d.title || JSON.stringify(d))))
+  if (conv.artifacts?.length) md += section('Artefacts produits', conv.artifacts.map((a) => (typeof a === 'string' ? a : a.name || JSON.stringify(a))))
   if (code.mcp_servers?.length) md += section('Serveurs MCP', code.mcp_servers.map((s) => JSON.stringify(s)))
   if (code.slash_commands?.length) md += section('Commandes', code.slash_commands.map((s) => JSON.stringify(s)))
 
