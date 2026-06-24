@@ -2,7 +2,8 @@
 
 > PortabIA est un outil web gratuit et open-source de portabilité d'historique et de contexte entre
 > assistants IA — « le RIO de l'IA ». Il permet de migrer ses règles, sa mémoire, ses décisions et son
-> historique de travail d'une IA vers une autre (Claude, ChatGPT, Gemini, Mistral, Grok, GitHub Copilot), sans rien perdre.
+> historique de travail d'une IA vers une autre — ou vers un autre compte de la MÊME IA (ex. changement
+> d'e-mail) — sans rien perdre. Prend en charge Claude, ChatGPT, Gemini, Mistral, Grok et GitHub Copilot.
 > Conçu et opéré par E²SN — Guillaume BOUTON. Licence Apache-2.0.
 
 ## Principes
@@ -11,11 +12,12 @@
 - **Sans API** (« Bring Your Own AI ») : PortabIA n'appelle aucune IA. Il génère des prompts que VOTRE IA
   exécute, et transforme vos fichiers d'export localement dans le navigateur.
 - **Confidentialité totale** : le contenu migré ne quitte jamais votre appareil (traitement 100% navigateur).
+  Anonymisation automatique des e-mails, secrets et chemins avant génération.
 - **Interopérabilité** : un format pivot neutre ouvert (« E²SN Portable AI Context Spec v1 ») + des
   adaptateurs vers les conventions natives de chaque IA (CLAUDE.md, AGENTS.md, GEMINI.md, .cursor/rules…).
 - **Souveraineté** : vous restez maître de votre contexte et de votre choix d'IA. Anti vendor lock-in.
 
-## IA prises en charge (dans les deux sens)
+## IA prises en charge (dans les deux sens, et d'un compte à l'autre de la même IA)
 
 - Claude (Anthropic) — fichier de règles CLAUDE.md
 - ChatGPT / Codex (OpenAI) — fichier AGENTS.md, export conversations.json
@@ -23,6 +25,33 @@
 - Mistral (Le Chat) — via AGENTS.md + prompt
 - Grok (xAI) — compatible CLAUDE.md
 - GitHub Copilot (Microsoft) — fichier copilot-instructions.md (.github/)
+
+## Migration entre deux comptes de la même IA (intra-IA) — vitrine Claude → Claude
+
+Cas d'usage phare : vous changez de compte Claude (par exemple à la suite d'un changement d'adresse
+e-mail) et vous voulez retrouver votre contexte sur le nouveau compte. PortabIA reconstitue :
+
+- vos **règles & préférences** dans un fichier `CLAUDE.md` prêt à déposer ;
+- votre **mémoire** dans un bloc dédié, prêt pour l'import natif de Claude (Réglages → Capacités →
+  Mémoire → « Démarrer l'import ») ;
+- votre **contexte de projet** (objectifs, décisions, état) à reprendre dans un Projet ;
+- une **synthèse d'historique** réutilisable (granularité : tout / l'essentiel / décisions seules).
+
+### Ce que Claude (Anthropic) propose, et ne propose pas (état des lieux, juin 2026)
+
+- **Historique de conversations et projets entre deux comptes personnels : non pris en charge** par
+  Anthropic (« migrating data between personal accounts » non supporté ; l'export de données n'est pas
+  réimportable dans un autre compte personnel). Seul transfert natif : compte personnel → Organisation
+  Team/Enterprise, à sens unique.
+- **Mémoire : import/export natif existe** (Réglages → Capacités), mais **expérimental** et **limité à la
+  mémoire**.
+
+### Limites assumées de PortabIA (transparence)
+
+PortabIA ne recrée pas les fils de discussion d'origine dans le nouveau compte — aucune API publique
+d'écriture ne le permet, chez aucun fournisseur. L'historique est donc fourni sous forme de **synthèse
+réutilisable** (document de référence), tandis que règles, mémoire et contexte de projet sont, eux,
+réellement reconstitués et réinjectables.
 
 ## Ce qui est portable
 
@@ -35,8 +64,42 @@
 RGPD (droit à la portabilité, Art. 20), CNIL, IA Act (transparence). Marques citées à titre nominatif ;
 PortabIA n'est affilié à aucun de ces services.
 
+## À propos d'E²SN et de l'écosystème
+
+PortabIA est un outil grand public gratuit de **E²SN — École des Souverainetés et Sécurités Numériques**
+(SAS, Lyon, France ; organisme de formation certifié **Qualiopi**). E²SN articule trois métiers en une
+maison : l'**École** (formations en cybersécurité et IA), l'**Édition** (logiciels) et le **Conseil**
+(stratégie cyber, conformité NIS2/DORA/RGPD). Manifeste : souveraineté numérique, interopérabilité,
+maîtrise de l'avenir économique et numérique des organisations et des apprenants.
+
+- **E²SNauthor** (https://essnauthor.fr) — le **LCMS** (Learning Content Management System) de l'Édition
+  E²SN : une suite française pour concevoir, diffuser, piloter et distribuer des formations
+  professionnelles, conforme par construction (RGPD, IA Act Art. 50, Qualiopi) et hébergée en France.
+  Modules : **Lyra** (agent IA qui génère des cours structurés), **Studio** (éditeur de cours dans le
+  navigateur), **LCMS** (diffusion présentiel/e-learning/blended), **Pilot** (gestion d'organisme,
+  sessions, émargement, Qualiopi), **Marketplace** (catalogue, paiement, distribution).
+- **PortabIA** est l'outil B2C d'appel de cet écosystème : même exigence de souveraineté et de
+  confidentialité, au service du grand public.
+
+## Dirigeants — parcours & compétences
+
+- **Guillaume Bouton** — Président & co-fondateur (Commerce & Innovation). Executive Master, emlyon
+  business school ; 20 ans en vente IT B2B et architecture de solutions ; membre de la French Tech
+  Saint-Étienne Lyon. Domaines : souveraineté numérique, CLOUD Act, conformité Qualiopi, régulation de
+  l'IA (IA Act), consolidation des outils de formation.
+- **Myriam Bouton** — Directrice Générale & co-fondatrice (pédagogie, programmes, stratégie académique).
+  Diplôme de langues (Université Lumière Lyon 2), Executive MBA IRIIG ; 20 ans dans l'Éducation nationale ;
+  spécialiste en ingénierie pédagogique, sciences cognitives appliquées et accessibilité (référente
+  handicap).
+- **Youri Minne** — Directeur de la Recherche (associé). Doctorat en sciences cognitives (Université
+  Lumière Lyon 2, thèse CIFRE Sydo / EMC / LIRIS, 2024) sur l'impact des contenus pédagogiques multimédias
+  interactifs sur l'attention et l'engagement ; ex-directeur pédagogique et de la recherche chez Sydo.
+  Domaines : sciences cognitives, attention, charge cognitive, pédagogie assistée par l'IA, souveraineté
+  de l'IA.
+
 ## Liens
 
-- Application : https://preview.essn.fr/portabia/
+- Application : https://portabia.essn.fr/
 - Éditeur : E²SN — https://essn.fr
 - Produit pédagogique associé : E²SNauthor — https://essnauthor.fr
+- Code source (open-source, Apache-2.0) : https://github.com/Poussnight/portabia

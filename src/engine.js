@@ -11,8 +11,8 @@ import { aiLabel } from './adapters/registry.js'
  * Mode A — génère le prompt d'export à coller dans l'IA SOURCE.
  * @returns {string}
  */
-export function makeExportPrompt(sourceAi, selection) {
-  return buildExportPrompt(sourceAi, selection)
+export function makeExportPrompt(sourceAi, selection, targetAi) {
+  return buildExportPrompt(sourceAi, selection, targetAi)
 }
 
 /**
@@ -53,8 +53,9 @@ export function makeImport({ bundle, targetAi, timestamp, anonymize = {} }) {
   }
 
   const nativeFile = renderNativeRules(b, targetAi)
-  const importPrompt = buildImportPrompt(targetAi, nativeFile)
-  return { nativeFile, importPrompt, bundle: b, anonymizedCount }
+  const sameAccount = (b.meta?.source_ai || '') === targetAi
+  const importPrompt = buildImportPrompt(targetAi, nativeFile, { sameAccount, hasMemory: !!nativeFile.hasMemory })
+  return { nativeFile, importPrompt, bundle: b, anonymizedCount, sameAccount }
 }
 
 /** Métadonnées d'action (pour l'historique côté backend — SANS contenu). */

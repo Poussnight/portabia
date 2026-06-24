@@ -7,6 +7,7 @@ import { makeExportPrompt, makeImport, actionMetadata } from './engine.js'
 import { downloadBridge, downloadBlob } from './download/bundle.js'
 import { LEGAL } from './content/legal.js'
 import { parseChatgptExport } from './transform/chatgptExport.js'
+import { parseClaudeExport, looksLikeClaudeExport } from './transform/claudeExport.js'
 import { parseRulesFile, aiFromFilename } from './transform/mdRules.js'
 import { onMounted } from 'vue'
 import AuthModal from './components/AuthModal.vue'
@@ -47,6 +48,9 @@ const items = reactive({ conv: true, instr: true, mem: false, proj: false, perso
 // granularité fine par item : 'total' (tout) ou 'partial' (l'essentiel)
 const gran = reactive({ conv: 'partial', instr: 'total', mem: 'total', proj: 'total', persona: 'total' })
 const granOptions = [{ id: 'total', label: 'Tout' }, { id: 'partial', label: "L'essentiel" }]
+// L'historique de conversations offre un 3ᵉ niveau « Décisions seules » (granularité fine).
+const granOptionsConv = [{ id: 'total', label: 'Tout' }, { id: 'partial', label: "L'essentiel" }, { id: 'decisions', label: 'Décisions' }]
+function granOptionsFor(id) { return id === 'conv' ? granOptionsConv : granOptions }
 function setGran(id, g) { gran[id] = g }
 const faqOpen = ref(0)
 const animOn = ref(true)
@@ -93,11 +97,12 @@ const bridges = computed(() => [
   { from: 'chatgpt', to: 'claude',  title: 'ChatGPT → Claude',  body: 'Vos longues conversations et instructions, reprises dans Claude sans copier-coller.' },
   { from: 'claude',  to: 'gemini',  title: 'Claude → Gemini',   body: 'Projets et contexte transférés vers l’écosystème Google.' },
   { from: 'mistral', to: 'chatgpt', title: 'Mistral → ChatGPT', body: 'Changez de fournisseur souverain sans perdre votre mémoire de travail.' },
+  { from: 'claude',  to: 'claude',  title: 'Claude → Claude',  body: 'Changez de compte Claude (nouvel e-mail) sans perdre instructions, mémoire et contexte de projet.' },
 ].map((b) => ({ ...b, fromMark: byId(b.from).mark, fromStyle: `background:${byId(b.from).grad}`, toMark: byId(b.to).mark, toStyle: `background:${byId(b.to).grad}` })))
 function startBridge(b) { source.value = b.from; target.value = b.to; view.value = 'wizard'; step.value = 0 }
 
 const steps = [
-  { num: '01', icon: '🌉', title: 'Choisissez le pont', body: 'Sélectionnez l’IA de départ et l’IA d’arrivée. PortabIA connaît les formats des cinq grandes plateformes.' },
+  { num: '01', icon: '🌉', title: 'Choisissez le pont', body: 'Sélectionnez l’IA de départ et l’IA d’arrivée — y compris la même IA sur un autre compte. PortabIA connaît les formats des six grandes plateformes.' },
   { num: '02', icon: '☑️', title: 'Sélectionnez ce qui compte', body: 'Conversations, instructions, projets, mémoire : vous cochez, vous gardez la main.' },
   { num: '03', icon: '📥', title: 'Récupérez votre contexte', body: 'PortabIA traduit le tout dans le format de destination. Vous importez, vous reprenez où vous étiez.' },
 ]
@@ -112,6 +117,7 @@ const faqsRaw = [
   { q: 'C’est vraiment gratuit ?', a: 'Entièrement. PortabIA est un service public gratuit opéré par E²SN, publié en open-source sous licence Apache-2.0.' },
   { q: 'Quelles IA sont prises en charge ?', a: 'Claude, ChatGPT, Gemini, Mistral, Grok et GitHub Copilot, dans les deux sens. D’autres ponts arrivent.' },
   { q: 'Que puis-je migrer exactement ?', a: 'Vos conversations, vos instructions et préférences, vos projets et fichiers, ainsi que la mémoire / le contexte long terme quand la plateforme l’expose.' },
+  { q: 'Et pour passer d’un compte Claude à un autre (changement d’e-mail) ?', a: 'C’est pris en charge : choisissez Claude en source ET en destination. Anthropic ne permet pas de transférer l’historique de conversations ni les projets entre deux comptes personnels (seul cas natif : compte perso → Organisation, à sens unique) ; la mémoire dispose d’un import/export natif mais expérimental. PortabIA reconstitue vos règles (CLAUDE.md), votre mémoire (bloc prêt pour l’import natif de Claude) et votre contexte de projet. En toute transparence : les fils de discussion d’origine ne sont pas recréés (aucune API ne le permet) — l’historique est fourni en synthèse réutilisable.' },
   { q: 'PortabIA est-il affilié à ces IA ?', a: 'Non. C’est un outil indépendant d’interopérabilité. Les marques citées appartiennent à leurs détenteurs.' },
 ]
 const faqs = computed(() => faqsRaw.map((f, i) => ({ ...f, open: faqOpen.value === i, sign: faqOpen.value === i ? '–' : '+' })))
@@ -155,9 +161,13 @@ const selCard = (on) => on
   ? 'border-color:var(--coral-500);box-shadow:var(--shadow-glow-coral);background:var(--surface-elevated);'
   : 'border-color:var(--border-default);background:var(--surface-elevated);'
 const sourceList = computed(() => AIS.map((a) => ({ ...a, markStyle: `background:${a.color}`, cardStyle: selCard(source.value === a.id) })))
-const targetList = computed(() => AIS.filter((a) => a.id !== source.value).map((a) => ({ ...a, markStyle: `background:${a.color}`, cardStyle: selCard(target.value === a.id) })))
-function pickSource(id) { source.value = id; if (target.value === id) target.value = null }
+// La cible peut être identique à la source : « même IA, autre compte » (ex. changement d'e-mail).
+const targetList = computed(() => AIS.map((a) => ({ ...a, markStyle: `background:${a.color}`,
+  cardStyle: selCard(target.value === a.id), same: a.id === source.value })))
+function pickSource(id) { source.value = id }
 function pickTarget(id) { target.value = id }
+// Migration intra-IA (même fournisseur, comptes différents).
+const sameAi = computed(() => !!source.value && !!target.value && engineId(source.value) === engineId(target.value))
 const itemList = computed(() => ITEMS.map((it) => {
   const locked = !!it.pro && !isAuthed.value
   const on = !!items[it.id] && !locked
@@ -201,10 +211,19 @@ async function onFile(ev) {
   try {
     const text = await file.text()
     const isJson = file.name.toLowerCase().endsWith('.json')
-    const res = isJson ? parseChatgptExport(text) : parseRulesFile(text, file.name)
+    let res, srcLabel
+    if (isJson) {
+      // Désambiguïsation par CONTENU : export Claude (chat_messages) vs ChatGPT (mapping).
+      let parsed = null
+      try { parsed = JSON.parse(text) } catch { /* géré par les parseurs */ }
+      if (parsed && looksLikeClaudeExport(parsed)) { res = parseClaudeExport(text); srcLabel = 'Claude' }
+      else { res = parseChatgptExport(text); srcLabel = 'ChatGPT' }
+    } else {
+      res = parseRulesFile(text, file.name)
+    }
     uploadedBundle.value = res.bundle
     uploadInfo.value = isJson
-      ? `${res.stats.conversations_kept} conversation(s), ${res.stats.messages} messages importés`
+      ? `${res.stats.conversations_kept} conversation(s) ${srcLabel}, ${res.stats.messages} messages importés`
       : `Fichier de règles importé (${aiFromFilename(file.name)})`
   } catch (e) {
     uploadError.value = e.message || 'Fichier non reconnu'
@@ -217,11 +236,13 @@ function buildSelection() {
   for (const it of ITEMS) {
     if (!items[it.id]) continue
     if (it.pro && !isAuthed.value) continue   // anonyme : axes avancés ignorés
-    const g = isAuthed.value ? (gran[it.id] || 'total') : 'total'   // granularité fine = inscrits
+    const raw = isAuthed.value ? (gran[it.id] || 'total') : 'total'   // granularité fine = inscrits
+    const g = raw === 'decisions' ? 'partial' : raw                   // « décisions » = un sous-cas de partiel
     // deux items peuvent viser le même axe (mem+proj, instr+persona) : 'total' (plus inclusif) l'emporte
     const cur = axes[it.axis]
     const scope = cur ? (cur.scope === 'total' || g === 'total' ? 'total' : 'partial') : g
-    axes[it.axis] = { on: true, scope, mode: it.axis === 'conversation' ? (scope === 'partial' ? 'summary' : 'full') : undefined }
+    const convMode = raw === 'decisions' ? 'decisions' : (scope === 'partial' ? 'summary' : 'full')
+    axes[it.axis] = { on: true, scope, mode: it.axis === 'conversation' ? convMode : undefined }
   }
   const scopes = Object.values(axes).map((a) => a.scope)
   const scope = scopes.length && scopes.every((s) => s === 'total') ? 'total'
@@ -256,7 +277,7 @@ function parsePastedBundle(text) {
 }
 // Le contenu réel : fichier déposé (Mode B) OU réponse collée de l'IA (Mode A).
 const effectiveBundle = computed(() => uploadedBundle.value || parsePastedBundle(pastedResponse.value))
-const exportPromptText = computed(() => makeExportPrompt(engineId(source.value), buildSelection()))
+const exportPromptText = computed(() => makeExportPrompt(engineId(source.value), buildSelection(), engineId(target.value)))
 const resultFiles = computed(() => {
   const eb = effectiveBundle.value
   if (!eb) return null
@@ -652,7 +673,8 @@ function downloadKit() {
       <!-- step 1 -->
       <template v-else-if="step===1">
         <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4vw,44px);letter-spacing:-.02em;margin:0 0 8px;">Vers quelle IA ?</h2>
-        <p style="font-size:16px;color:var(--text-secondary);margin:0 0 28px;">Destination du pont depuis <strong style="color:var(--text-primary);">{{ src.name }}</strong>.</p>
+        <p style="font-size:16px;color:var(--text-secondary);margin:0 0 12px;">Destination du pont depuis <strong style="color:var(--text-primary);">{{ src.name }}</strong> — une autre IA, <strong style="color:var(--text-primary);">ou {{ src.name }} elle-même</strong> (changement de compte).</p>
+        <p v-if="sameAi" style="font-size:13.5px;color:var(--coral-700);background:var(--coral-50);border:1px solid color-mix(in srgb,var(--coral-500) 24%,transparent);border-radius:10px;padding:9px 13px;margin:0 0 22px;">Même IA, <strong>compte différent</strong> (ex. nouvelle adresse e-mail) : on reconstitue vos règles, votre mémoire et votre contexte de projet sur le nouveau compte.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;">
           <button v-for="a in targetList" :key="a.id" @click="pickTarget(a.id)" :style="'display:flex;align-items:center;gap:12px;padding:18px;border-radius:16px;cursor:pointer;border:2px solid;'+a.cardStyle">
             <span :style="'width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#fff;flex:none;'+a.markStyle">{{ a.mark }}</span>
@@ -676,7 +698,7 @@ function downloadKit() {
             <!-- granularité fine : réservée aux inscrits -->
             <div v-if="it.on && isAuthed" style="display:flex;align-items:center;gap:8px;padding:0 20px 16px 62px;">
               <span style="font-size:12px;color:var(--text-muted);">Quantité :</span>
-              <button v-for="g in granOptions" :key="g.id" @click="setGran(it.id, g.id)" :style="segStyle(it, g.id)">{{ g.label }}</button>
+              <button v-for="g in granOptionsFor(it.id)" :key="g.id" @click="setGran(it.id, g.id)" :style="segStyle(it, g.id)">{{ g.label }}</button>
             </div>
             <div v-else-if="it.on && !isAuthed" style="padding:0 20px 14px 62px;">
               <button @click="requireAuth" style="font-family:var(--font-sans);font-size:12.5px;font-weight:600;color:var(--coral-700);background:none;border:none;cursor:pointer;padding:0;">🔒 Régler la quantité (Tout / l'essentiel) — réservé aux inscrits →</button>
@@ -688,7 +710,7 @@ function downloadKit() {
           <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
             <div>
               <div style="font-size:14.5px;font-weight:600;color:var(--text-primary);">Vous avez un fichier d'export ? <span v-if="isAuthed" style="font-weight:400;color:var(--text-muted);">(optionnel)</span><span v-else style="font-family:var(--font-sans);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--coral-700);background:var(--coral-50);border:1px solid color-mix(in srgb,var(--coral-500) 30%,transparent);border-radius:999px;padding:3px 9px;margin-left:8px;">🔒 Inscription</span></div>
-              <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">Déposez votre <code style="font-family:var(--font-mono);font-size:12px;">conversations.json</code> (ChatGPT) ou un fichier de règles (CLAUDE.md, AGENTS.md…) pour une migration directe, traitée dans votre navigateur.</div>
+              <div style="font-size:13px;color:var(--text-secondary);margin-top:3px;">Déposez votre <code style="font-family:var(--font-mono);font-size:12px;">conversations.json</code> (export Claude ou ChatGPT — détecté automatiquement) ou un fichier de règles (CLAUDE.md, AGENTS.md…) pour une migration directe, traitée dans votre navigateur.</div>
             </div>
             <label v-if="isAuthed" style="font-family:var(--font-sans);font-weight:600;font-size:14px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:10px;padding:10px 16px;cursor:pointer;white-space:nowrap;">
               Choisir un fichier
@@ -743,6 +765,11 @@ function downloadKit() {
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
               <button @click="downloadNative" style="font-family:var(--font-sans);font-weight:600;font-size:15px;color:#fff;background:var(--coral-500);border:none;border-radius:12px;padding:12px 18px;cursor:pointer;box-shadow:var(--shadow-glow-coral);">⬇ Télécharger {{ resultFiles.nativeFile.filename }}</button>
               <button @click="copy(resultFiles.importPrompt,'imp')" style="font-family:var(--font-sans);font-weight:600;font-size:15px;color:var(--text-primary);background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:12px;padding:12px 18px;cursor:pointer;">{{ copied==='imp' ? 'Prompt copié ✓' : 'Copier le prompt d\'import' }}</button>
+            </div>
+            <div v-if="sameAi" style="font-size:12.5px;color:var(--text-muted);line-height:1.55;background:var(--surface-sunken);border:1px solid var(--border-subtle);border-radius:12px;padding:11px 14px;">
+              <strong style="color:var(--text-secondary);">En toute transparence (Claude → Claude).</strong>
+              On reconstitue : vos <strong>règles</strong> ({{ resultFiles.nativeFile.filename }}), votre <strong>mémoire</strong> (bloc prêt pour l'import natif <em>Réglages → Capacités → Démarrer l'import</em>) et votre <strong>contexte de projet</strong>.
+              En revanche, on ne recrée pas vos fils de discussion d'origine — aucune API ne le permet — l'historique est fourni sous forme de <strong>synthèse réutilisable</strong>.
             </div>
           </template>
         </div>
