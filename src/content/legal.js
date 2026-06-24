@@ -10,7 +10,7 @@ export const LEGAL = {
       ['Hébergement', 'Site hébergé au sein de l’Union européenne (France).'],
       ['Nature du service', 'Service en ligne gratuit et open-source (licence Apache-2.0) de portabilité d’historique/contexte entre assistants IA.'],
       ['Propriété intellectuelle', 'Le code source est publié sous licence Apache-2.0 ; toute réutilisation doit conserver l’attribution « E²SN — Guillaume BOUTON » (voir le fichier NOTICE).'],
-      ['Marques', 'Claude, ChatGPT, Codex, Gemini, Mistral, Le Chat et Grok sont cités à titre nominatif pour décrire l’interopérabilité. PortabIA n’est ni affilié ni sponsorisé par leurs détenteurs respectifs.'],
+      ['Marques', 'Claude, ChatGPT, Codex, Gemini, Mistral, Le Chat, Grok et GitHub Copilot sont cités à titre nominatif pour décrire l’interopérabilité. PortabIA n’est ni affilié ni sponsorisé par leurs détenteurs respectifs.'],
     ],
   },
   cgu: {

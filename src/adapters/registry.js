@@ -1,5 +1,5 @@
 /**
- * PortabIA — registre des 5 IA majeures et de leurs spécificités.
+ * PortabIA — registre des 6 IA majeures et de leurs spécificités.
  * Conçu par E²SN — Guillaume BOUTON. Apache-2.0.
  *
  * Source de vérité des conventions par IA (fichiers de règles natifs, mémoire,
@@ -68,6 +68,19 @@ export const AIS = {
     mcp: true,
     slashCommands: true,
     notes: 'Compatible CLAUDE.md nativement + Grok Skills.',
+  },
+  copilot: {
+    id: 'copilot',
+    label: 'GitHub Copilot (Microsoft)',
+    tools: ['GitHub Copilot', 'Copilot Chat', 'Copilot CLI'],
+    rulesFile: 'copilot-instructions.md', // déposé dans .github/
+    rulesScopes: ['.github/copilot-instructions.md', '.github/instructions/*.instructions.md'],
+    memory: 'instructions personnalisées + contexte (côté service, non exportable en fichier)',
+    convExport: null,
+    mcp: true, // Copilot supporte MCP (agents)
+    slashCommands: true, // Copilot Chat : /fix, /explain, /tests…
+    notes: 'Contexte projet via .github/copilot-instructions.md (VS Code, Visual Studio, JetBrains).',
+    fallbackRulesFile: 'AGENTS.md',
   },
 }
 

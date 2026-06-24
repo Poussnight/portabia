@@ -2,7 +2,7 @@
 
 > PortabIA est un outil web gratuit et open-source de portabilité d'historique et de contexte entre
 > assistants IA — « le RIO de l'IA ». Il permet de migrer ses règles, sa mémoire, ses décisions et son
-> historique de travail d'une IA vers une autre (Claude, ChatGPT, Gemini, Mistral, Grok), sans rien perdre.
+> historique de travail d'une IA vers une autre (Claude, ChatGPT, Gemini, Mistral, Grok, GitHub Copilot), sans rien perdre.
 > Conçu et opéré par E²SN — Guillaume BOUTON. Licence Apache-2.0.
 
 ## Principes
@@ -22,6 +22,7 @@
 - Gemini (Google) — fichier GEMINI.md
 - Mistral (Le Chat) — via AGENTS.md + prompt
 - Grok (xAI) — compatible CLAUDE.md
+- GitHub Copilot (Microsoft) — fichier copilot-instructions.md (.github/)
 
 ## Ce qui est portable
 

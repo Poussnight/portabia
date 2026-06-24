@@ -2,7 +2,7 @@
 
 **Emportez votre contexte d'une IA à l'autre.** PortabIA génère, **100 % dans votre navigateur**,
 un « pont » qui porte vos instructions, préférences et historique de travail d'une IA
-(ChatGPT, Claude, Gemini, Mistral, Grok) vers une autre — sans API, sans coût, sans que
+(ChatGPT, Claude, Gemini, Mistral, Grok, GitHub Copilot) vers une autre — sans API, sans coût, sans que
 votre contenu ne quitte votre machine.
 
 🔗 **En ligne : https://portabia.essn.fr** — service gratuit opéré par [E²SN](https://essn.fr).

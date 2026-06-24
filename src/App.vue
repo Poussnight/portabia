@@ -19,6 +19,7 @@ const AIS = [
   { id: 'gemini',  name: 'Gemini',  mark: 'Ge', color: '#4F86E0', grad: 'radial-gradient(circle at 32% 28%,#7BA6EC,#4F86E0)' },
   { id: 'mistral', name: 'Mistral', mark: 'Mi', color: '#F2A93B', grad: 'radial-gradient(circle at 32% 28%,#F7C46A,#F2A93B)' },
   { id: 'grok',    name: 'Grok',    mark: 'Gr', color: '#2A2E37', grad: 'radial-gradient(circle at 32% 28%,#565B66,#2A2E37)' },
+  { id: 'copilot', name: 'Copilot', mark: 'Co', color: '#8957E5', grad: 'radial-gradient(circle at 32% 28%,#A579F0,#8957E5)' },
 ]
 const byId = (id) => AIS.find((a) => a.id === id) || {}
 // base servie (/ en prod, /portabia/ en preview) — pour les assets de public/
@@ -81,7 +82,8 @@ onMounted(async () => {
 
 /* ---------- LANDING data ---------- */
 const ais = computed(() => AIS.map((a) => ({ ...a, markStyle: `background:${a.color}` })))
-const heroPts = [[230, 45], [387, 159], [327, 343], [133, 343], [73, 159]]
+// Disposition hexagonale (6 IA) autour du hub E²SN (230,205), rayon ~163
+const heroPts = [[230, 42], [371, 123], [371, 287], [230, 368], [89, 287], [89, 123]]
 const nodes = computed(() => AIS.map((a, i) => {
   const [x, y] = heroPts[i]
   return { ...a, x, y, cdx: x, cdy: y - 18, tx: x, ty: y + 6,
@@ -108,7 +110,7 @@ const guarantees = [
 const faqsRaw = [
   { q: 'Mes données sont-elles vraiment privées ?', a: 'Oui. Toute la conversion se fait localement, dans votre navigateur. Aucun historique n’est téléversé sur un serveur — PortabIA n’a pas de base de données de vos contenus.' },
   { q: 'C’est vraiment gratuit ?', a: 'Entièrement. PortabIA est un service public gratuit opéré par E²SN, publié en open-source sous licence Apache-2.0.' },
-  { q: 'Quelles IA sont prises en charge ?', a: 'Claude, ChatGPT, Gemini, Mistral et Grok, dans les deux sens. D’autres ponts arrivent.' },
+  { q: 'Quelles IA sont prises en charge ?', a: 'Claude, ChatGPT, Gemini, Mistral, Grok et GitHub Copilot, dans les deux sens. D’autres ponts arrivent.' },
   { q: 'Que puis-je migrer exactement ?', a: 'Vos conversations, vos instructions et préférences, vos projets et fichiers, ainsi que la mémoire / le contexte long terme quand la plateforme l’expose.' },
   { q: 'PortabIA est-il affilié à ces IA ?', a: 'Non. C’est un outil indépendant d’interopérabilité. Les marques citées appartiennent à leurs détenteurs.' },
 ]
@@ -367,10 +369,10 @@ function downloadKit() {
             <svg viewBox="0 0 460 440" width="100%" style="max-width:540px;overflow:visible;">
               <defs><linearGradient id="paGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4F86E0"/><stop offset=".3" stop-color="#1F9E96"/><stop offset=".6" stop-color="#D97757"/><stop offset="1" stop-color="#F2A93B"/></linearGradient></defs>
               <g stroke="var(--border-strong)" stroke-width="2" fill="none" opacity="0.4">
-                <path d="M230 205 Q250 110 230 45"/><path d="M230 205 Q330 150 387 159"/><path d="M230 205 Q300 290 327 343"/><path d="M230 205 Q160 290 133 343"/><path d="M230 205 Q120 150 73 159"/>
+                <path d="M230 205 Q250 120 230 42"/><path d="M230 205 Q330 150 371 123"/><path d="M230 205 Q330 260 371 287"/><path d="M230 205 Q210 290 230 368"/><path d="M230 205 Q130 260 89 287"/><path d="M230 205 Q130 150 89 123"/>
               </g>
               <g class="pa-bridge" stroke="url(#paGrad)" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-dasharray="7 13" style="animation:pa-flow 2.6s linear infinite;">
-                <path d="M230 205 Q250 110 230 45"/><path d="M230 205 Q330 150 387 159"/><path d="M230 205 Q300 290 327 343"/><path d="M230 205 Q160 290 133 343"/><path d="M230 205 Q120 150 73 159"/>
+                <path d="M230 205 Q250 120 230 42"/><path d="M230 205 Q330 150 371 123"/><path d="M230 205 Q330 260 371 287"/><path d="M230 205 Q210 290 230 368"/><path d="M230 205 Q130 260 89 287"/><path d="M230 205 Q130 150 89 123"/>
               </g>
               <g v-for="n in nodes" :key="n.id" class="pa-node" :style="n.anim">
                 <circle :cx="n.x" :cy="n.y" r="38" fill="var(--surface-elevated)" stroke="var(--border-default)" stroke-width="1.5"/>
@@ -394,12 +396,12 @@ function downloadKit() {
       <section id="compat" style="max-width:var(--container);margin:0 auto;padding:48px 32px 8px;">
         <div style="text-align:center;margin-bottom:30px;">
           <p style="font-family:var(--font-sans);font-weight:600;font-size:13px;letter-spacing:.2em;color:var(--coral-700);text-transform:uppercase;margin:0 0 12px;">Compatible</p>
-          <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(28px,3.4vw,42px);line-height:1.06;letter-spacing:-.02em;margin:0;color:var(--text-primary);">5 IA majeures. <span style="font-family:var(--font-serif);font-weight:400;font-style:italic;color:var(--coral-600);">Dans les deux sens.</span></h2>
+          <h2 style="font-family:var(--font-display);font-weight:700;font-size:clamp(28px,3.4vw,42px);line-height:1.06;letter-spacing:-.02em;margin:0;color:var(--text-primary);">6 IA majeures. <span style="font-family:var(--font-serif);font-weight:400;font-style:italic;color:var(--coral-600);">Dans les deux sens.</span></h2>
         </div>
-        <div class="pa-aigrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:18px;">
-          <div v-for="a in ais" :key="a.id" class="pa-aicard pa-glass" style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:30px 12px;border-radius:24px;">
-            <span :style="'width:60px;height:60px;border-radius:50%;background:'+a.grad+';box-shadow:0 8px 20px '+a.color+'66;'"></span>
-            <span style="font-family:var(--font-sans);font-weight:600;font-size:19px;color:var(--text-primary);">{{ a.name }}</span>
+        <div class="pa-aigrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:14px;">
+          <div v-for="a in ais" :key="a.id" class="pa-aicard pa-glass" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:26px 8px;border-radius:22px;">
+            <span :style="'width:54px;height:54px;border-radius:50%;background:'+a.grad+';box-shadow:0 8px 20px '+a.color+'66;'"></span>
+            <span style="font-family:var(--font-sans);font-weight:600;font-size:17px;color:var(--text-primary);">{{ a.name }}</span>
           </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:30px;">

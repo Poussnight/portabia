@@ -11,7 +11,7 @@ const FILE_TO_AI = {
   'agents.md': 'openai',
   'gemini.md': 'gemini',
   '.cursorrules': 'unknown',
-  'copilot-instructions.md': 'unknown',
+  'copilot-instructions.md': 'copilot',
   'memory.md': 'grok',
 }
 

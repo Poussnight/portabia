@@ -161,9 +161,12 @@ def send_mail(to_email, subject, html):
                     except (smtplib.SMTPException, OSError):
                         pass
                 s.sendmail(from_addr, [to_email], msg.as_string())
+        app.logger.info('mail OK -> %s | %s', to_email, subject)
         return True
-    except OSError as e:
-        app.logger.error('mail err %s', e)
+    except Exception as e:
+        # Tout echec (OSError reseau OU SMTPException rejet relais) doit etre trace,
+        # sinon une notif d'inscription se perd en silence dans le thread async.
+        app.logger.error('mail ERR -> %s | %s | %s: %s', to_email, subject, type(e).__name__, e)
         return False
 
 
